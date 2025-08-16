@@ -4,3 +4,8 @@ cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON - [-S . Source dir = curr
 
 ** relink compile_commands.json
 ln -sf build/compile_commands.json compile_commands.json
+
+** adding ssh key for github
+ssh-keygen -t ed25519 -C "zacharyghenry@gmail.com" - creates
+eval "$(ssh-agent -s)" - creates agent pid
+ssh-add ~/.ssh/id_ed25519 - adds key to agent
