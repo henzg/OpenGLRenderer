@@ -1,0 +1,5 @@
+/home/ghosty/renderer/include/CMakeFiles/renderer.dir
+/home/ghosty/renderer/include/CMakeFiles/glad.dir
+/home/ghosty/renderer/include/CMakeFiles/imgui.dir
+/home/ghosty/renderer/include/CMakeFiles/edit_cache.dir
+/home/ghosty/renderer/include/CMakeFiles/rebuild_cache.dir
