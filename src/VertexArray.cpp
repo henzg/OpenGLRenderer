@@ -1,5 +1,7 @@
 #include "VertexArray.h"
-#include "glad/glad.h"
+#include "VertexBufferLayout.h"
+
+#include <iostream>
 
 VertexArray::VertexArray()
 {
@@ -11,12 +13,23 @@ VertexArray::~VertexArray()
     glDeleteVertexArrays(1, &m_RendererID);
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vb)
+void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
 {
     Bind();
     vb.Bind();
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    const auto& elements = layout.GetElements();
+    for (GLuint i = 0;i<elements.size(); i++)
+    {
+        const auto& element = elements[i];
+        glEnableVertexAttribArray(i);
+        glVertexAttribPointer(i, 
+                              element.GetComponentCount(),
+                              ShaderDataTypeToOpenGLBaseType(element.Type), 
+                              element.Normalized ? GL_TRUE : GL_FALSE,
+                              static_cast<GLsizei>(layout.GetStride()),
+                              reinterpret_cast<const void*>( static_cast<uintptr_t>(element.Offset)));
+        std::cout << "Element info: || elementcomponentcount: " << element.GetComponentCount() << " || Normalized: " << element.Normalized << " || Stride " << layout.GetStride() << " || offset: " << element.Offset << "\n";
+    }
 }
 
 void VertexArray::Bind() const

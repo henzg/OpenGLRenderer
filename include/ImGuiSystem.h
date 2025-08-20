@@ -6,7 +6,7 @@
 
 class ImGuiSystem {
 public:
-    ImGuiSystem(GLFWwindow* window, bool enableDocking, bool enableViewports, const char* glsl_version);
+    ImGuiSystem(GLFWwindow* window, bool enableDocking = true, bool enableViewports = false, const char* glsl_version = "#version 330");
     ~ImGuiSystem();
 
     void begin_frame();
@@ -16,4 +16,5 @@ private:
     GLFWwindow* m_Window;
     ImGuiContext* m_Context{nullptr};
     GLFWwindow* m_ViewportBackup;
+
 };

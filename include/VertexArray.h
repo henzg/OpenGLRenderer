@@ -2,6 +2,8 @@
 
 #include "VertexBuffer.h"
 
+class VertexBufferLayout;
+
 class VertexArray 
 {
 public:
@@ -10,7 +12,7 @@ public:
 
     void Bind() const;
     void Unbind() const;
-    void AddBuffer(const VertexBuffer& vb);
+    void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
 private:
     unsigned int m_RendererID;
 };

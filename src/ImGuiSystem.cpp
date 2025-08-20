@@ -1,6 +1,6 @@
 #include "ImGuiSystem.h"
 
-ImGuiSystem::ImGuiSystem(GLFWwindow* window, bool enableDocking = true, bool enableViewports = false, const char* glsl_version = "#version 330")
+ImGuiSystem::ImGuiSystem(GLFWwindow* window, bool enableDocking, bool enableViewports, const char* glsl_version)
     : m_Window(window), m_ViewportBackup(nullptr)
 {
     // context
