@@ -5,7 +5,7 @@
 #include "GLFW/glfw3.h"
 
 Window::Window()
-    : m_width(800), m_height(600)
+    : m_width(1000), m_height(850)
 {
     // 1) Init glfw window
     glfwInit();
@@ -22,7 +22,7 @@ Window::Window()
     }
     glfwMakeContextCurrent(m_window);
     
-    // 3) initiate glad before we call any opengl functions
+    // 3) initiate glad before we call opengl functions
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to init GLAD" << std::endl;
@@ -36,3 +36,4 @@ Window::~Window()
 {
     glfwDestroyWindow(m_window);
 }
+

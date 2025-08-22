@@ -39,4 +39,4 @@ add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw OpenGL::GL imgui)
-target_include_directories(${PROJECT_NAME} PRIVATE libs/glad/include)
+target_include_directories(${PROJECT_NAME} PRIVATE libs/glad/include libs/glm)
