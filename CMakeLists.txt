@@ -35,8 +35,12 @@ set(IMGUI_SOURCES
     ${IMGUI_DIR}/imgui_impl_glfw.cpp
     ${IMGUI_DIR}/imgui_impl_opengl3.cpp
 )
+
+add_library(glm_lib INTERFACE)
+target_include_directories(glm_lib INTERFACE ${CMAKE_SOURCE_DIR}/libs)
+
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw OpenGL::GL imgui)
-target_include_directories(${PROJECT_NAME} PRIVATE libs/glad/include libs/glm)
+target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw OpenGL::GL imgui glm_lib)
+target_include_directories(${PROJECT_NAME} PRIVATE libs/glad/include)

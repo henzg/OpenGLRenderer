@@ -3,19 +3,25 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+#include <string>
+
 class Window
 {
 public:
 
-    Window();
+    Window(const std::string& title, int width, int height);
     ~Window();
 
     void pollEvents() const { glfwPollEvents(); }
-    void swapBuffers() const { glfwSwapBuffers(m_window); }
-    bool shouldClose() const { return glfwWindowShouldClose(m_window); }
-    GLFWwindow* getNativeHandler() const { return m_window; }
+    void swapBuffers() const { glfwSwapBuffers(m_Window); }
+    bool shouldClose() const { return glfwWindowShouldClose(m_Window); }
+    
+    GLFWwindow* getNativeHandler() const { return m_Window; }
+    int getWidth() const { return m_Width; }
+    int getHeight() const { return m_Height; }
 
 private:
-    unsigned int m_width = 0, m_height = 0;
-    GLFWwindow* m_window = nullptr;
+    std::string m_Title;
+    unsigned int m_Width = 0, m_Height = 0;
+    GLFWwindow* m_Window = nullptr;
 };
