@@ -30,7 +30,7 @@ void Renderer::Init()
     */
     m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
     /*Add shaders*/
-    /*
+    /*render
     AddShader("texShader", "../shaders/texshader.vs", "../shaders/texshader.fs");
     Shader* texShader = GetShader("texShader");
     if (texShader)
@@ -109,7 +109,7 @@ void Renderer::Run() {
         //*--- Rendering--------------------------------------------------------------------*//
         // imgui
         m_ImGuiSystem.begin_frame();
-        m_DevWindow.Draw(m_Window.getWidth(), m_Window.getHeight());
+        m_DevWindow.Draw(m_Window.getWidth(), m_Window.getHeight(), *this, m_DeltaTime);
         m_ImGuiSystem.end_frame();
 
         // swap buffers and pollevents

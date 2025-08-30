@@ -14,7 +14,7 @@ public:
     DeveloperWindow(const std::string& title,ImVec2 initialPos, ImVec2 initialSize);
     ~DeveloperWindow() = default;
     
-    void Draw(int mainWindowWidth, int mainWindowHeight);
+    void Draw(int mainWindowWidth, int mainWindowHeight, Renderer& renderer, float deltaTime);
 
     /*--- Utilities for Widgets-------------------------------------------------------------*/
     template<typename T, typename... Args>
@@ -22,6 +22,7 @@ public:
     {
         m_Widgets.push_back(std::make_unique<T>(std::forward<Args>(args)...));    
     }
+    void RemoveWidget(const std::string& label);
     void ClearWidgets();
     /*--------------------------------------------------------------------------------------*/
     /*--- Utilities for Tests---------------------------------------------------------------*/

@@ -36,7 +36,6 @@ private:
     std::map<std::string, std::unique_ptr<Shader>> m_Shaders;
     std::vector<std::unique_ptr<Mesh>> m_Meshes;
     std::map<std::string, std::unique_ptr<Texture>> m_Textures;
-    std::unique_ptr<test::TestMenu> m_TestMenu;
 
 public:
     Renderer(const std::string& title, int width, int height);
@@ -52,6 +51,7 @@ public:
     // RendererWindow
     int GetWindowWidth() const {return m_Window.getWidth();}
     int GetWindowHeight() const {return m_Window.getHeight();}
+    ImVec4 GetWindowDefaultColor() const {return m_WinColor;}
 
     // RendererCamera
     glm::mat4 GetCameraViewMatrix() const {return m_Camera.GetViewMatrix();}
@@ -60,9 +60,6 @@ public:
     const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return m_Meshes; }
     int GetMeshesSize() const {return m_Meshes.size();}
     
-    // TestMenu
-    test::TestMenu* GetTestMenu() {return m_TestMenu.get();}
-
     /*Add resources*/
     void AddMesh(const std::string& name, const float* verticies, unsigned int numVerticies, 
                  const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout,
@@ -80,5 +77,13 @@ public:
     void AddDevWindowWidget(Args&&... args)
     {
         m_DevWindow.AddWidget<T>(std::forward<Args>(args)...);
+    }
+    void RemoveDevWindowWidget(const std::string& label)
+    {
+        m_DevWindow.RemoveWidget(label);
+    }
+    void ClearDevWindowWidget()
+    {
+        m_DevWindow.ClearWidgets();
     }
 };

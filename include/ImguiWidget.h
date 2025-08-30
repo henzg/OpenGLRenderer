@@ -35,6 +35,7 @@ private:
     float m_Max;
 };
 
+
 class ImguiColorEdit4 : public ImguiWidget
 {
 private:
@@ -62,8 +63,6 @@ public:
 private:
     ImVec4* m_Color = nullptr;
     bool m_UsePicker, m_WithAlpha;
-
-
 
 };
 

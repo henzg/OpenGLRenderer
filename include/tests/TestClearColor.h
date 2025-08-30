@@ -12,8 +12,13 @@ namespace test {
         TestClearColor(const std::string& name);
         ~TestClearColor();
 
+        void OnAttach(Renderer& renderer) override;
         void OnUpdate(float deltaTime) override;
-        void OnRender() override;
+        void OnRender(Renderer& renderer) override;
         void OnImGuiRender(Renderer& renderer) override;
+        void OnDetach(Renderer& renderer) override;
+        
+        void ResetColor();
+        
     };   
 }
