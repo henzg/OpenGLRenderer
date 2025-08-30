@@ -10,6 +10,7 @@ ImGuiSystem::ImGuiSystem(GLFWwindow* window, bool enableDocking, bool enableView
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.FontGlobalScale = 1.5f;
     //if (enableDocking) io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     //if (enableViewports) io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 

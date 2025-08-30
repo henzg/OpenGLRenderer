@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../libs/imgui/imgui.h"
-#include "string"
-#include "../libs/glm/glm.hpp"
+#include "imgui/imgui.h"
+#include "glm/glm.hpp"
+
+#include <string>
 
 class ImguiWidget 
 {
@@ -32,6 +33,20 @@ private:
     float* m_Value;
     float m_Min;
     float m_Max;
+};
+
+class ImguiColorEdit4 : public ImguiWidget
+{
+private:
+    ImVec4* m_Color = nullptr;
+    
+public:
+    ImguiColorEdit4(const std::string& label, ImVec4* color)
+        : ImguiWidget(label), m_Color(color) {}
+    void Draw() override
+    {
+        ImGui::ColorEdit4(GetLabel().c_str(), (float*)m_Color);    
+    }
 };
 
 class ImguiColorPicker4 : public ImguiWidget

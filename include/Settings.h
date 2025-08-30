@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glad/glad.h"
-#include "../libs/imgui/imgui.h"
+#include "imgui/imgui.h"
 
 /*--------------ImGui widget Vars-----------*/
 static float texvis = .02f;

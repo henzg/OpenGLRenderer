@@ -1,28 +1,36 @@
 #include "Renderer.h"
 
 #include "Core.h"
-#include "Data.h"
-#include "Settings.h"
-#include "glm/ext/matrix_transform.hpp"
 #include <GLFW/glfw3.h>
+
+#include "tests/TestClearColor.h"
 
 Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
       m_ImGuiSystem(m_Window.getNativeHandler()),
-      m_DevWindow(title, ImVec2(800,800), ImVec2(700,800))
+      m_DevWindow(title, ImVec2(800,800), ImVec2(700,800)),
+      m_Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f))
 {}
 
 Renderer::~Renderer() {}
 
 void Renderer::Init() 
 {
-    glEnable(GL_DEPTH_TEST);
-    
+    /*--- OGL init settings ----------------------------------------------------------------*/
+    GLClearError();
+    GLCall(glEnable(GL_DEPTH_TEST));
+    GLCall(glClearColor(m_WinColor.x, m_WinColor.y, m_WinColor.z, m_WinColor.w));
+    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    /*--------------------------------------------------------------------------------------*/
+     
+    /*
     m_DevWindow.AddWidget<ImguiSliderFloat>("Mix Value", &m_TexVis, 0.0f, 1.0f);
     m_DevWindow.AddWidget<ImguiSliderFloat>("FOV", &m_Fov, 10.0f, 180.0f);
     m_DevWindow.AddWidget<ImguiColorPicker4>("Clear COlor", &m_WinColor, true);
-
+    */
+    m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
     /*Add shaders*/
+    /*
     AddShader("texShader", "../shaders/texshader.vs", "../shaders/texshader.fs");
     Shader* texShader = GetShader("texShader");
     if (texShader)
@@ -31,12 +39,14 @@ void Renderer::Init()
         texShader->setInt("texture1", 0);
         texShader->setInt("texture2", 1);
     }
-
+    */
     /*Add Textures*/
+    /*
     AddTexture("woodTex", "../res/wood.png", false, false);
     AddTexture("awesomeFace", "../res/awesomeface.png", true, true);
-
+    */
     /*Add Meshes*/
+    /*
     VertexBufferLayout cubeLayout = {
         {ShaderDataType::Float3, "a_Position"},
         {ShaderDataType::Float2, "textCords"}
@@ -45,21 +55,22 @@ void Renderer::Init()
     AddMesh("mainCube", cubeverticies, sizeof(cubeverticies) / (5 * sizeof(float)), 
             cubeIndicies, sizeof(cubeIndicies) / sizeof(unsigned int),
            cubeLayout, "texShader", {"woodTex", "awesomeFace"});
+    */
 }
 
 void Renderer::Run() {
-   while (!ShouldClose())
+    while (!ShouldClose())
     {
-        // per-frame logic
+        
+        /*--- per-frame logic --------------------------------------------------------------*/
+        GLClearError();
         float currentFrame = static_cast<float>(glfwGetTime());
         m_DeltaTime = currentFrame - m_LastFrame;
         m_LastFrame = currentFrame;
-
         ProcessInput();
+        /*----------------------------------------------------------------------------------*/
 
-        glClearColor(m_WinColor.x, m_WinColor.y, m_WinColor.z, m_WinColor.w);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+        /*
         // Bind Textures
         Texture* tex1 = GetTexture("woodTex");
         Texture* tex2 = GetTexture("awesomeFace");
@@ -79,10 +90,8 @@ void Renderer::Run() {
                                                     0.1f, 100.0f);
             currentShader->setMat4("projection", projection);
             // view
-            glm::mat4 view = glm::lookAt(glm::vec3 (0.f,0.f,3.f), /*camea position*/ 
-                                         glm::vec3 (0.f,0.f,0.f), /*look at origin*/ 
-                                         glm::vec3(0.f,1.f,0.f)); /*up vector*/
-            currentShader->setMat4("view", view);
+            //glm::mat4 view = m_Camera.GetViewMatrix();
+            currentShader->setMat4("view", m_Camera.GetViewMatrix());
 
             for (size_t i = 0; i < m_Meshes.size(); ++i)
             {
@@ -96,10 +105,11 @@ void Renderer::Run() {
             }
 
         } else {std::cerr << "Shader not initilaized\n";}
-        
+        */
+        //*--- Rendering--------------------------------------------------------------------*//
         // imgui
         m_ImGuiSystem.begin_frame();
-        m_DevWindow.Draw();
+        m_DevWindow.Draw(m_Window.getWidth(), m_Window.getHeight());
         m_ImGuiSystem.end_frame();
 
         // swap buffers and pollevents
@@ -108,11 +118,13 @@ void Renderer::Run() {
     }
 }
 
+/* Wrapper function for glfwwindow.shouldClose(); */
 bool Renderer::ShouldClose() const 
 {
     return m_Window.shouldClose();
 }
 
+/* Add a mesh to the mesh vector for rendering */
 void Renderer::AddMesh(const std::string& name, const float* verticies, unsigned int numVerticies, 
                        const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout,
                        const std::string& shaderName, const std::vector<std::string>& textureNames)
@@ -120,6 +132,8 @@ void Renderer::AddMesh(const std::string& name, const float* verticies, unsigned
     m_Meshes.push_back(std::make_unique<Mesh>(verticies, numVerticies, indicies, numIndicies, layout));
 }
 
+
+/* Add a shader to the Shader map to use for rendering. Has a unique name, and shader object */
 void Renderer::AddShader(const std::string& name, const std::string& vsPath, const std::string& fsPath)
 {
     m_Shaders.emplace(name, std::make_unique<Shader>(vsPath.c_str(), fsPath.c_str()));
@@ -151,10 +165,23 @@ Texture* Renderer::GetTexture(const std::string& name)
     return nullptr;
 }
 
+
 void Renderer::ProcessInput()
 {
     if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(m_Window.getNativeHandler(), true);
+    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_A) == GLFW_PRESS)
+        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::LEFT, m_DeltaTime);
+    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_E) == GLFW_PRESS)
+        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::BACKWARD, m_DeltaTime);
+    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_D) == GLFW_PRESS)
+        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::RIGHT, m_DeltaTime);
+    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_Q) == GLFW_PRESS)
+        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::FORWARD, m_DeltaTime);
+    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_W) == GLFW_PRESS)
+       m_Camera.ProcessKeyboardActions(Camera::CameraMovement::UP, m_DeltaTime);
+    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_S) == GLFW_PRESS)
+        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::DOWN, m_DeltaTime);
 }
 
 void Renderer::Cleanup() {

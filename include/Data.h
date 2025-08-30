@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../libs/glm/glm.hpp"
+#include "glm/glm.hpp"
 
 // some data used throughout for testing purposes
 static float verticies[] =
