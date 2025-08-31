@@ -8,6 +8,10 @@ namespace test {
     {
     private:
         float m_ClearColor[4];
+        bool m_CheckboxState = false;
+        float m_Time = 0.f;
+        float m_Speed = 5.f;
+        bool m_PartyTime = false;
     public:
         TestClearColor(const std::string& name);
         ~TestClearColor();

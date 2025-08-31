@@ -94,9 +94,16 @@ public:
         glDeleteShader(fragment);
     }
 
-    void use()
+    ~Shader(){glDeleteProgram(m_ShaderID);}
+
+    void Bind()
     {
         glUseProgram(m_ShaderID);
+    }
+
+    void Unbind()
+    {
+        glUseProgram(0);
     }
 
     bool IsValid() const { return m_ShaderID != 0; }
@@ -105,10 +112,12 @@ public:
     {
         glUniform1i(glGetUniformLocation(m_ShaderID, name.c_str()), (int)value);
     }
+    
     void setInt(const std::string& name, int value) const
     {
         glUniform1i(glGetUniformLocation(m_ShaderID, name.c_str()), value);
     }
+    
     void setFloat(const std::string& name, float value) const 
     {
         glUniform1f(glGetUniformLocation(m_ShaderID, name.c_str()), value);

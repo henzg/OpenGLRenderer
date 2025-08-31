@@ -37,7 +37,15 @@ void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& 
             ImGui::Separator();
             for (const auto& widget : m_Widgets)
             {
-                widget->Draw();
+                    if(widget->IsEnabled())
+                    {
+                        widget->Draw();
+                    } else
+                    {
+                        ImGui::BeginDisabled(true);
+                        widget->Draw();
+                        ImGui::EndDisabled();
+                    }
             }
             m_CurrentTest->OnImGuiRender(renderer);
             m_CurrentTest->OnUpdate(deltaTime); // openGL update/render methods
@@ -63,6 +71,44 @@ void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& 
     ImGui::End();
 }
 
+ImguiWidget* DeveloperWindow::FindWidget(const std::string& label)
+{
+    auto it = std::find_if(m_Widgets.begin(), m_Widgets.end(),
+                           [&](const std::unique_ptr<ImguiWidget>& w) {return w->GetLabel() == label; });
+    return (it != m_Widgets.end()) ? it->get() : nullptr;
+}
+
+const ImguiWidget* DeveloperWindow::FindWidget(const std::string& label) const 
+{
+    auto it = std::find_if(m_Widgets.begin(), m_Widgets.end(),
+                           [&](const std::unique_ptr<ImguiWidget>& w) {return w->GetLabel() == label; });
+    return (it != m_Widgets.end()) ? it->get() : nullptr;
+
+}
+
+void DeveloperWindow::EnableWidget(const std::string& label)
+{
+    if (auto* w = FindWidget(label)) w->SetEnabled(true);
+}
+
+void DeveloperWindow::DisableWidget(const std::string& label)
+{
+    if (auto* w = FindWidget(label)) w->SetEnabled(false);
+}
+
+void DeveloperWindow::ToggleWidget(const std::string& label)
+{
+    if (auto* w = FindWidget(label)) w->SetEnabled(!w->IsEnabled());
+}
+
+bool DeveloperWindow::IsWidgetEnabled(const std::string& label) const
+{
+    if(auto* w = FindWidget(label)) 
+        return w->IsEnabled();
+    return false;
+    
+}
+
 void DeveloperWindow::ClearWidgets()
 {
     m_Widgets.clear();
@@ -75,3 +121,6 @@ void DeveloperWindow::RemoveWidget(const std::string& label)
     });
     m_Widgets.erase(it, m_Widgets.end());
 }
+
+
+

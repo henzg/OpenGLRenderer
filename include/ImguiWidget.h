@@ -13,8 +13,12 @@ public:
 
     virtual void Draw() = 0;
     const std::string& GetLabel() const { return m_Label; }
+
+    void SetEnabled(bool enabled) {m_isEnabled = enabled;}
+    bool IsEnabled() const {return m_isEnabled;}
 private:
     std::string m_Label;
+    bool m_isEnabled = true;
 
 };
 

@@ -55,6 +55,7 @@ set(APP_SRC
     src/tests/Test.cpp
    # src/tests/Test3DBasics.cpp
     src/tests/TestClearColor.cpp
+    src/tests/TestTriangle.cpp
 )
 # file(GLOB_RECURSE APP_SRC ${CMAKE_SOURCE_DIR}/src/*.cpp) # old implementation, works but less explicit. Keep for now in case files dont load and you want to set using this method.
 

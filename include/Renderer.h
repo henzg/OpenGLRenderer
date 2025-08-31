@@ -29,8 +29,6 @@ private:
 
     float m_DeltaTime = 0.0f;
     float m_LastFrame = 0.0f;
-    //float m_Fov = 90.0f;
-    //float m_TexVis = 0.02f;
     ImVec4 m_WinColor = {0.2f, 0.3f, 0.3f, 1.0f};
 
     std::map<std::string, std::unique_ptr<Shader>> m_Shaders;
@@ -52,6 +50,7 @@ public:
     int GetWindowWidth() const {return m_Window.getWidth();}
     int GetWindowHeight() const {return m_Window.getHeight();}
     ImVec4 GetWindowDefaultColor() const {return m_WinColor;}
+    float GetDeltaTime() const {return m_DeltaTime;}
 
     // RendererCamera
     glm::mat4 GetCameraViewMatrix() const {return m_Camera.GetViewMatrix();}
@@ -85,5 +84,20 @@ public:
     void ClearDevWindowWidget()
     {
         m_DevWindow.ClearWidgets();
+    }
+
+    void ToggleDevWindowWidget(const std::string& label)
+    {
+        m_DevWindow.ToggleWidget(label);
+    }
+
+    void EnableDevWindowWidget(const std::string& label)
+    {
+        m_DevWindow.EnableWidget(label);
+    }
+
+    void DisableDevWindowWidget(const std::string& label)
+    {
+        m_DevWindow.DisableWidget(label);
     }
 };

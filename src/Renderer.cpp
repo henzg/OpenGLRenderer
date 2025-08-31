@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "tests/TestClearColor.h"
+#include "tests/TestTriangle.h"
 
 Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
@@ -23,11 +24,6 @@ void Renderer::Init()
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     /*--------------------------------------------------------------------------------------*/
      
-    /*
-    m_DevWindow.AddWidget<ImguiSliderFloat>("Mix Value", &m_TexVis, 0.0f, 1.0f);
-    m_DevWindow.AddWidget<ImguiSliderFloat>("FOV", &m_Fov, 10.0f, 180.0f);
-    m_DevWindow.AddWidget<ImguiColorPicker4>("Clear COlor", &m_WinColor, true);
-    */
     m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
     /*Add shaders*/
     /*render

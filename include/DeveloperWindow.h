@@ -24,6 +24,11 @@ public:
     }
     void RemoveWidget(const std::string& label);
     void ClearWidgets();
+
+    void EnableWidget(const std::string& label);
+    void DisableWidget(const std::string& label);
+    void ToggleWidget(const std::string& label);
+    bool IsWidgetEnabled(const std::string& label) const;
     /*--------------------------------------------------------------------------------------*/
     /*--- Utilities for Tests---------------------------------------------------------------*/
     template<typename T>
@@ -41,5 +46,8 @@ private:
     std::vector<std::unique_ptr<ImguiWidget>> m_Widgets;
     std::unique_ptr<test::Test> m_CurrentTest;
     std::vector<std::pair<std::string, std::function<std::unique_ptr<test::Test>()>>> m_Tests;
+
+    ImguiWidget* FindWidget(const std::string& label);
+    const ImguiWidget* FindWidget(const std::string& label) const;
 };
 
