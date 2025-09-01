@@ -39,6 +39,38 @@ private:
     float m_Max;
 };
 
+class ImguiDragFloat2 : public ImguiWidget
+{
+private:
+    glm::vec2* m_Coords;
+    float m_Change;
+public:
+    ImguiDragFloat2(const std::string& label, glm::vec2* coords, float change)
+        : ImguiWidget(label), m_Coords(coords), m_Change(change) {}
+
+    void Draw() override
+    {
+        ImGui::DragFloat2(GetLabel().c_str(), (float*)m_Coords, m_Change);
+    }
+};
+
+class ImguiDragFloat3 : public ImguiWidget
+{
+public:
+    ImguiDragFloat3(const std::string& label, glm::vec3* position, float change) 
+        : ImguiWidget(label), m_Position(position), m_Change(change) {}
+
+    void Draw() override
+    {
+        ImGui::DragFloat3(GetLabel().c_str(), (float*)m_Position, m_Change);
+    }
+
+private:
+    glm::vec3* m_Position;
+    float m_Change;
+
+};
+
 
 class ImguiColorEdit4 : public ImguiWidget
 {
@@ -70,19 +102,3 @@ private:
 
 };
 
-class ImguiDragFloat3 : public ImguiWidget
-{
-public:
-    ImguiDragFloat3(const std::string& label, glm::vec3* position, float change) 
-        : ImguiWidget(label), m_Position(position), m_Change(change) {}
-
-    void Draw() override
-    {
-        ImGui::DragFloat3(GetLabel().c_str(), (float*)m_Position, m_Change);
-    }
-
-private:
-    glm::vec3* m_Position;
-    float m_Change;
-
-};

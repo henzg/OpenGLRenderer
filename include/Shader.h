@@ -128,6 +128,14 @@ public:
             glGetUniformLocation(m_ShaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
     }
 
+    void setVec2(const std::string& name, const glm::vec2& value) const {
+        glUniform2f(glGetUniformLocation(m_ShaderID, name.c_str()), value[0], value[1]);
+    }
+
+    void setVec4(const std::string& name, const glm::vec4& value) const {
+       glUniform4f(glGetUniformLocation(m_ShaderID, name.c_str()), value[0], value[1], value[2], value[3]);
+    }
+
     inline uint32_t getShaderId() { return m_ShaderID; }
 };
 

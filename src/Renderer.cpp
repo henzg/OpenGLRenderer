@@ -19,12 +19,13 @@ void Renderer::Init()
 {
     /*--- OGL init settings ----------------------------------------------------------------*/
     GLClearError();
-    GLCall(glEnable(GL_DEPTH_TEST));
+    //GLCall(glEnable(GL_DEPTH_TEST));
     GLCall(glClearColor(m_WinColor.x, m_WinColor.y, m_WinColor.z, m_WinColor.w));
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     /*--------------------------------------------------------------------------------------*/
      
     m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
+    m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test");
     /*Add shaders*/
     /*render
     AddShader("texShader", "../shaders/texshader.vs", "../shaders/texshader.fs");
@@ -60,6 +61,8 @@ void Renderer::Run() {
         
         /*--- per-frame logic --------------------------------------------------------------*/
         GLClearError();
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
         float currentFrame = static_cast<float>(glfwGetTime());
         m_DeltaTime = currentFrame - m_LastFrame;
         m_LastFrame = currentFrame;
@@ -160,7 +163,6 @@ Texture* Renderer::GetTexture(const std::string& name)
     std::cout << "ERROR||FIND||TEXTURE||" << name << "||NOT FOUND||\n";
     return nullptr;
 }
-
 
 void Renderer::ProcessInput()
 {

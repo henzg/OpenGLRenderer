@@ -13,7 +13,7 @@ public:
     void Unbind() const;
 
     virtual const VertexBufferLayout& GetLayout() const {return m_Layout;}
-    virtual void SetLayout(VertexBufferLayout& layout) {m_Layout = layout;}
+    virtual void SetLayout(const VertexBufferLayout& layout) {m_Layout = layout;}
 
 private:
     unsigned int m_RendererID;
