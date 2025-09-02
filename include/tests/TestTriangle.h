@@ -38,7 +38,7 @@ namespace test
         TestTriangle(const std::string& name);
         ~TestTriangle();
 
-        void OnAttach(Renderer& renderer) override; // inits buffers and shaders and such
+        void OnAttach(Renderer& renderer) override;
         void OnUpdate(float deltaTime) override;
         void OnRender(Renderer& render) override;
         void OnImGuiRender(Renderer& renderer) override;

@@ -5,6 +5,8 @@
 
 #include "tests/TestClearColor.h"
 #include "tests/TestTriangle.h"
+#include "tests/TestSquare.h"
+#include "tests/Test3DBasics.h"
 
 Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
@@ -19,40 +21,14 @@ void Renderer::Init()
 {
     /*--- OGL init settings ----------------------------------------------------------------*/
     GLClearError();
-    //GLCall(glEnable(GL_DEPTH_TEST));
     GLCall(glClearColor(m_WinColor.x, m_WinColor.y, m_WinColor.z, m_WinColor.w));
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     /*--------------------------------------------------------------------------------------*/
      
     m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
     m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test");
-    /*Add shaders*/
-    /*render
-    AddShader("texShader", "../shaders/texshader.vs", "../shaders/texshader.fs");
-    Shader* texShader = GetShader("texShader");
-    if (texShader)
-    {
-        texShader->use();
-        texShader->setInt("texture1", 0);
-        texShader->setInt("texture2", 1);
-    }
-    */
-    /*Add Textures*/
-    /*
-    AddTexture("woodTex", "../res/wood.png", false, false);
-    AddTexture("awesomeFace", "../res/awesomeface.png", true, true);
-    */
-    /*Add Meshes*/
-    /*
-    VertexBufferLayout cubeLayout = {
-        {ShaderDataType::Float3, "a_Position"},
-        {ShaderDataType::Float2, "textCords"}
-    };
-
-    AddMesh("mainCube", cubeverticies, sizeof(cubeverticies) / (5 * sizeof(float)), 
-            cubeIndicies, sizeof(cubeIndicies) / sizeof(unsigned int),
-           cubeLayout, "texShader", {"woodTex", "awesomeFace"});
-    */
+    m_DevWindow.RegisterTest<test::TestSquare>("Test Square");
+    m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube");
 }
 
 void Renderer::Run() {
@@ -62,49 +38,13 @@ void Renderer::Run() {
         /*--- per-frame logic --------------------------------------------------------------*/
         GLClearError();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         float currentFrame = static_cast<float>(glfwGetTime());
         m_DeltaTime = currentFrame - m_LastFrame;
         m_LastFrame = currentFrame;
         ProcessInput();
         /*----------------------------------------------------------------------------------*/
 
-        /*
-        // Bind Textures
-        Texture* tex1 = GetTexture("woodTex");
-        Texture* tex2 = GetTexture("awesomeFace");
-        if (tex1) tex1->BindandActivate(GL_TEXTURE0);
-        if (tex2) tex2->BindandActivate(GL_TEXTURE1);
-
-        // activate shaders
-        Shader* currentShader = GetShader("texShader");
-        if (currentShader)
-        {
-            currentShader->use();
-            currentShader->setFloat("texvis", m_TexVis);
-
-            // projection matrix
-            glm::mat4 projection = glm::perspective(glm::radians(m_Fov), 
-                                                    static_cast<float>(m_Window.getWidth()) / m_Window.getHeight(),
-                                                    0.1f, 100.0f);
-            currentShader->setMat4("projection", projection);
-            // view
-            //glm::mat4 view = m_Camera.GetViewMatrix();
-            currentShader->setMat4("view", m_Camera.GetViewMatrix());
-
-            for (size_t i = 0; i < m_Meshes.size(); ++i)
-            {
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, cubePositions[i]);
-                float angle = 25.0f * (float)glfwGetTime();
-                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                currentShader->setMat4("model", model);
-
-                m_Meshes[i]->Draw();
-            }
-
-        } else {std::cerr << "Shader not initilaized\n";}
-        */
         //*--- Rendering--------------------------------------------------------------------*//
         // imgui
         m_ImGuiSystem.begin_frame();

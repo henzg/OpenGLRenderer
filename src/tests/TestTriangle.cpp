@@ -48,8 +48,6 @@ namespace test
     }
     void TestTriangle::OnRender(Renderer& renderer) 
     {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
         if(m_ShowTriWireFrame)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
@@ -74,10 +72,10 @@ namespace test
         {
             if(m_TriCheckboxState == true)
             {
-                renderer.DisableDevWindowWidget("TriangleColor");
+                renderer.DisableDevWindowWidget("Triangle Color");
                 m_PartyTime = true;
             } else {
-                renderer.EnableDevWindowWidget("TriangleColor");
+                renderer.EnableDevWindowWidget("Triangle Color");
                 m_PartyTime = false;
             }
         }   
