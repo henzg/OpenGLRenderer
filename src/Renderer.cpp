@@ -7,6 +7,7 @@
 #include "tests/TestTriangle.h"
 #include "tests/TestSquare.h"
 #include "tests/Test3DBasics.h"
+#include "tests/TestLighting.h"
 
 Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
@@ -29,6 +30,7 @@ void Renderer::Init()
     m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test");
     m_DevWindow.RegisterTest<test::TestSquare>("Test Square");
     m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube");
+    m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
 }
 
 void Renderer::Run() {
@@ -69,6 +71,11 @@ void Renderer::AddMesh(const std::string& name, const float* verticies, unsigned
                        const std::string& shaderName, const std::vector<std::string>& textureNames)
 {
     m_Meshes.push_back(std::make_unique<Mesh>(verticies, numVerticies, indicies, numIndicies, layout));
+}
+
+void Renderer::ClearMeshes()
+{
+    m_Meshes.clear();
 }
 
 

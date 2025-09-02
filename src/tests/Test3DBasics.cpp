@@ -80,5 +80,6 @@ namespace test {
     void Test3DBasics::OnImGuiRender(Renderer& renderer) {}
     void Test3DBasics::OnDetach(Renderer& renderer) {
         glDisable(GL_DEPTH_TEST);
+        renderer.ClearMeshes();
     }
 }

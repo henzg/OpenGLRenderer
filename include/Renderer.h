@@ -63,6 +63,7 @@ public:
     void AddMesh(const std::string& name, const float* verticies, unsigned int numVerticies, 
                  const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout,
                  const std::string& shaderName, const std::vector<std::string>& textureNames);
+    void ClearMeshes();
 
     void AddShader(const std::string& name, const std::string& vsPath, const std::string& fsPath);
     Shader* GetShader(const std::string& name);
