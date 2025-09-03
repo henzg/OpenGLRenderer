@@ -81,5 +81,6 @@ namespace test {
     void Test3DBasics::OnDetach(Renderer& renderer) {
         glDisable(GL_DEPTH_TEST);
         renderer.ClearMeshes();
+        renderer.ClearDevWindowWidgets();
     }
 }

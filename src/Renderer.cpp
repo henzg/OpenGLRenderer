@@ -13,18 +13,18 @@ Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
       m_ImGuiSystem(m_Window.getNativeHandler()),
       m_DevWindow(title, ImVec2(800,800), ImVec2(700,800)),
-      m_Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f))
+      m_Camera()
 {}
 
 Renderer::~Renderer() {}
 
-void Renderer::Init() 
+void Renderer::OnInit() 
 {
     /*--- OGL init settings ----------------------------------------------------------------*/
     GLClearError();
     GLCall(glClearColor(m_WinColor.x, m_WinColor.y, m_WinColor.z, m_WinColor.w));
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    /*--------------------------------------------------------------------------------------*/
+    /*--- Register Tests--------------------------------------------------------------------*/
      
     m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
     m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test");
@@ -33,21 +33,19 @@ void Renderer::Init()
     m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
 }
 
-void Renderer::Run() {
+void Renderer::OnRun() {
     while (!ShouldClose())
     {
         
         /*--- per-frame logic --------------------------------------------------------------*/
         GLClearError();
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         float currentFrame = static_cast<float>(glfwGetTime());
         m_DeltaTime = currentFrame - m_LastFrame;
         m_LastFrame = currentFrame;
         ProcessInput();
         /*----------------------------------------------------------------------------------*/
-
-        //*--- Rendering--------------------------------------------------------------------*//
         // imgui
         m_ImGuiSystem.begin_frame();
         m_DevWindow.Draw(m_Window.getWidth(), m_Window.getHeight(), *this, m_DeltaTime);
@@ -129,6 +127,6 @@ void Renderer::ProcessInput()
         m_Camera.ProcessKeyboardActions(Camera::CameraMovement::DOWN, m_DeltaTime);
 }
 
-void Renderer::Cleanup() {
+void Renderer::OnCleanup() {
     glfwTerminate();
 }

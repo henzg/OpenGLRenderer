@@ -26,30 +26,30 @@ Window::Window(const std::string& title, int width, int height)
     if (m_Window == nullptr)
     {
         std::cerr << "Failed to create GLFW window\n";
-        glfwTerminate();
-        throw std::runtime_error("Failed to create GLFW window");
+        GLCall(glfwTerminate());
+        throw std::runtime_error("ERROR::GLFW::WINDOW::COULD NOT BE CREATED");
     }
-    glfwMakeContextCurrent(m_Window);
+    GLCall(glfwMakeContextCurrent(m_Window));
     
     // 3) initiate glad before we call opengl functions
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    if GLCall((!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)))
     {
         std::cerr << "Failed to init GLAD\n";
-        glfwDestroyWindow(m_Window);
-        glfwTerminate();
+        GLCall(glfwDestroyWindow(m_Window));
+        GLCall(glfwTerminate());
         throw std::runtime_error("Failed to initilize glad");
     }
 
-    glfwSetWindowUserPointer(m_Window, this);
-    glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
+    GLCall(glfwSetWindowUserPointer(m_Window, this));
+    GLCall(glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback));
 
     // 4) initial viewport
-    glViewport(0,0,m_Width,m_Height);
+    GLCall(glViewport(m_OriginCoordinates[0],m_OriginCoordinates[1],m_Width,m_Height));
 }
 
 Window::~Window()
 {
-    glfwDestroyWindow(m_Window);
+    GLCall(glfwDestroyWindow(m_Window));
 }
 
 void Window::setDimensions(int width, int height)

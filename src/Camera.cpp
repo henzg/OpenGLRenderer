@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-Camera::Camera(glm::vec3 position, glm::vec3 target)
-    : m_CameraPosition(position), m_CameraFront(glm::vec3(0.0f, 0.0f, -1.0f)), m_WorldUp(glm::vec3(0.0f, 1.0f, 0.0f))
+Camera::Camera(glm::vec3 position, glm::vec3 up, float zoom)
+    : m_CameraPosition(position), m_CameraFront(glm::vec3(0.0f, 0.0f, -1.0f)), m_WorldUp(up), m_Zoom(zoom)
 {
     UpdateCameraVectors();
 }
@@ -20,12 +20,12 @@ void Camera::UpdateCameraVectors()
 
 glm::mat4 Camera::GetViewMatrix() const 
 {
-    return glm::lookAt(GetPosition(), GetPosition() + m_CameraFront, m_CameraUp);
+    return glm::lookAt(m_CameraPosition, m_CameraPosition + m_CameraFront, m_CameraUp);
 }
 
 void Camera::ProcessKeyboardActions(CameraMovement direction, float deltaTime, float speedModifier)
 {
-   float velocity = speedModifier * (GetCameraSpeed() * deltaTime);
+   float velocity = speedModifier * (m_CameraSpeed * deltaTime);
 
     switch (direction)
     {
@@ -49,4 +49,13 @@ void Camera::ProcessKeyboardActions(CameraMovement direction, float deltaTime, f
             break;
     }
     
+}
+
+void Camera::ProcessMouseScroll(float yoffset)
+{
+    m_Zoom -= (float)yoffset;
+    if (m_Zoom < 1.0f)
+        m_Zoom = 1.0f;
+    if (m_Zoom > 45.0f)
+        m_Zoom = 45.0f;
 }

@@ -12,9 +12,9 @@ int main()
     {
         const std::string myTitle = "zacstack.dev";
         Renderer program(myTitle, 1080, 720);
-        program.Init();
-        program.Run();
-        program.Cleanup();
+        program.OnInit();
+        program.OnRun();
+        program.OnCleanup();
     } 
     catch (const std::runtime_error& e)
     {

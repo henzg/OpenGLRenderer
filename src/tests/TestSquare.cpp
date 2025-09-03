@@ -72,6 +72,11 @@ namespace test
             
         }
     }
-    void TestSquare::OnDetach(Renderer& renderer) {}
+    void TestSquare::OnDetach(Renderer& renderer) 
+    {
+        //renderer.CleanUpResources();
+        renderer.ClearDevWindowWidgets();
+        renderer.ClearTextures();
+    }
 /*--- End of test namespace-----------------------------------------------------------------*/
 }

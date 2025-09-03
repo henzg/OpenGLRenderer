@@ -45,6 +45,11 @@ void Texture::Bind()
     glBindTexture(m_TextureType, m_RendererID);
 }
 
+void Texture::Unbind()
+{
+    glBindTexture(m_TextureType, 0);
+}
+
 void Texture::BindandActivate(GLenum textureUnit)
 {
     glActiveTexture(textureUnit);

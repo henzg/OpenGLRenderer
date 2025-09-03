@@ -28,5 +28,6 @@ public:
 private:
     std::string m_Title;
     unsigned int m_Width = 0, m_Height = 0;
+    GLint m_OriginCoordinates [2] = {0,0};
     GLFWwindow* m_Window = nullptr;
 };

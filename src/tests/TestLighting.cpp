@@ -1,5 +1,6 @@
 #include "tests/TestLighting.h"
 
+#include "ImguiWidget.h"
 #include "VertexBufferLayout.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -16,12 +17,16 @@ namespace test
     
         void TestLighting::OnAttach(Renderer& renderer) 
         {
+
+            renderer.AddDevWindowWidget<ImguiDragFloat3>("Light Pos", &m_LightPosition, .05);        
+
             glEnable(GL_DEPTH_TEST);
             m_ObjVAO = std::make_unique<VertexArray>();
             m_VBO = std::make_unique<VertexBuffer>(m_Verticies, sizeof(m_Verticies));
             VertexBufferLayout cubeLayout =
         {
             {ShaderDataType::Float3, "aPos"},
+            {ShaderDataType::Float3, "aNormal"},
         };
             m_ObjVAO->AddBuffer(*m_VBO, cubeLayout);
             m_ObjVAO->Unbind();
@@ -39,8 +44,9 @@ namespace test
         {
             m_LightingShader->Bind();
             m_LightingShader->setVec3("objectColor", m_ObjectColor);
-            m_LightingShader->setVec3("lightColor", m_LightColor);      
-            glm::mat4 projection = glm::perspective(glm::radians(45.f), (float)renderer.GetWindowWidth() / (float)renderer.GetWindowHeight(), 0.1f, 100.f);
+            m_LightingShader->setVec3("lightColor", m_LightColor);
+            m_LightingShader->setVec3("lightPos", m_LightPosition);
+            glm::mat4 projection = glm::perspective(glm::radians(renderer.GetCameraZoom()), (float)renderer.GetWindowWidth() / (float)renderer.GetWindowHeight(), 0.1f, 100.f);
             glm::mat4 view = renderer.GetCameraViewMatrix();
             m_LightingShader->setMat4("projection", projection);
             m_LightingShader->setMat4("view", view);
