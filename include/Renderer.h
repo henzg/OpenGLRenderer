@@ -59,6 +59,7 @@ public:
     /*-- Camera Manager Functions ----------------------------------------------------------*/
     glm::mat4 GetCameraViewMatrix() const { return m_Camera.GetViewMatrix(); }
     float GetCameraZoom() const { return m_Camera.GetZoom(); }
+    glm::vec3 GetCameraPosition() const { return m_Camera.GetPosition(); }
 
     // RendererMeshes
     const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return m_Meshes; }
