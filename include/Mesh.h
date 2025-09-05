@@ -11,6 +11,17 @@
 #include <string>
 #include <memory>
 
+#include "GeometryData.h"
+
+enum class MeshLayout
+{
+    NONE = 0,
+    POSITION_ONLY,
+    POSITION_NORMAL,
+    POSITION_TEXTCOORD,
+    POSITION_NORMAL_TEXCOORD,
+};
+
 class Mesh {
 private:
     std::unique_ptr<VertexArray> m_VAO;

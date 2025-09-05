@@ -8,6 +8,7 @@
 #include "tests/TestSquare.h"
 #include "tests/Test3DBasics.h"
 #include "tests/TestLighting.h"
+#include "tests/TestMaterials.h"
 
 Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
@@ -31,6 +32,7 @@ void Renderer::OnInit()
     m_DevWindow.RegisterTest<test::TestSquare>("Test Square");
     m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube");
     m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
+    m_DevWindow.RegisterTest<test::TestMaterials>("Materials");
 }
 
 void Renderer::OnRun() {

@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include "GeometryData.h"
 
 #include <vector>
 #include <memory>

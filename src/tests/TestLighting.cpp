@@ -54,7 +54,8 @@ namespace test
             m_LightingShader->setFloat("ambientModify", m_AmbientModify);
             m_LightingShader->setFloat("diffuseModify", m_DiffuseModify);
     
-            glm::mat4 projection = glm::perspective(glm::radians(renderer.GetCameraZoom()), (float)renderer.GetWindowWidth() / (float)renderer.GetWindowHeight(), 0.1f, 100.f);
+            glm::mat4 projection = glm::perspective(glm::radians(renderer.GetCameraZoom()), 
+                                    (float)renderer.GetWindowWidth() / (float)renderer.GetWindowHeight(), 0.1f, 100.f);
             glm::mat4 view = renderer.GetCameraViewMatrix();
             m_LightingShader->setMat4("projection", projection);
             m_LightingShader->setMat4("view", view);

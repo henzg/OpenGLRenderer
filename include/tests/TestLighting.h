@@ -27,9 +27,10 @@ namespace test
 
         glm::vec3 m_ObjectColor = {1.f, .5f, .31f};
         glm::vec3 m_LightColor = {1.f, 1.f, 1.f};
-        float m_SpecModify = 0.0;
-        float m_AmbientModify = 0.0;
-        float m_DiffuseModify = 0.0;
+        float m_SpecModify = 0.0f;
+        float m_AmbientModify = 0.0f;
+        float m_DiffuseModify = 0.0f;
+        bool m_DisableLighting = false;
 
         glm::vec3 m_LightPosition = {1.2f, 1.0f, 2.0f};
         float m_Verticies[6*36] = 
