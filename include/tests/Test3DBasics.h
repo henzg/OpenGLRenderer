@@ -92,7 +92,7 @@ namespace test {
 
         float m_TextureMix = 0.0f;
         float m_Fov = 90.0f;
-        ImVec4 m_WinColor = {.2f, 0.3f, .3f, 1.f};
+        glm::vec3 m_WinColor = {.2f, 0.3f, .3f};
 
     public:
         Test3DBasics(const std::string& name);

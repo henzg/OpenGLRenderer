@@ -8,9 +8,9 @@ namespace test {
 
     void TestLightingMaps::OnAttach(Renderer& renderer) 
     {
-        glEnable(GL_DEPTH_TEST);
-
-        renderer.AddDevWindowWidget<ImguiDragFloat3>("Light Position", &m_LightPosition, .008);
+        renderer.EnableDepthTest(true);
+        renderer.AddDevWindowWidget<ImguiDragFloat3>("Light Position", &m_LightPosition, .008f);
+        renderer.AddDevWindowWidget<ImguiDragFloat3>("Rotation", &m_CubeRotation, .05f);
         std::string m_LightingMapVS = "../shaders/LightingMaps.vs";
         std::string m_LightingMapFS = "../shaders/LightingMaps.fs";
         std::string m_LightCubeVS   = "../shaders/LightCubeMaps.vs";
@@ -27,7 +27,6 @@ namespace test {
 
         m_ObjVAO->AddBuffer(*m_VBO, cubeLayout);
         m_ObjVAO->Unbind();
-
         m_LightVAO = std::make_unique<VertexArray>();
         m_LightVAO->AddBuffer(*m_VBO, cubeLayout);
         m_LightVAO->Unbind();
@@ -37,30 +36,35 @@ namespace test {
     
         m_LightingShader->Bind();
         renderer.AddTexture("crate", "../res/crate.png", true, true);
+        renderer.AddTexture("crateSpec", "../res/crate_specular.png", true, true);
         m_LightingShader->setInt("material.diffuse", 0);
+        m_LightingShader->setInt("material.specular", 1);
         m_LightingShader->Unbind();
     }
     void TestLightingMaps::OnUpdate(float deltaTime) {}
     void TestLightingMaps::OnRender(Renderer& renderer) 
     {
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderer.SetClearColor(0.1f, 0.1f, 0.1f);
         m_LightingShader->Bind();
         Texture* tex1 = renderer.GetTexture("crate");
+        Texture* tex2 = renderer.GetTexture("crateSpec");
         if (tex1) tex1->BindandActivate(GL_TEXTURE0);
+        if (tex2) tex2->BindandActivate(GL_TEXTURE1);
 
         m_LightingShader->setVec3("light.ambient", m_LightAmbient);
         m_LightingShader->setVec3("light.diffuse", m_LightDiffuse);
         m_LightingShader->setVec3("light.specular", m_LightSpecular);
         m_LightingShader->setVec3("light.position", m_LightPosition);
         m_LightingShader->setVec3("viewPos", renderer.GetCameraPosition());
-        m_LightingShader->setVec3("material.specular", {0.5,0.5,0.5});
         m_LightingShader->setFloat("material.shininess", 64.f);
         
         glm::mat4 projection = glm::perspective(glm::radians(renderer.GetCameraZoom()), 
                             (float)renderer.GetWindowWidth() / (float)renderer.GetWindowHeight(), 0.1f, 100.f);
         glm::mat4 view = renderer.GetCameraViewMatrix();
         glm::mat4 model = glm::mat4(1.f);
+        model = glm::rotate(model, glm::radians(m_CubeRotation[0]), glm::vec3(1.f, 0.f, .0f));
+        model = glm::rotate(model, glm::radians(m_CubeRotation[1]), glm::vec3(0.f, 1.f, .0f));
+        model = glm::rotate(model, glm::radians(m_CubeRotation[2]), glm::vec3(0.f, 0.f, 1.f));
         m_LightingShader->setMat4("projection", projection);
         m_LightingShader->setMat4("view", view);
         m_LightingShader->setMat4("model", model);
@@ -84,8 +88,10 @@ namespace test {
     void TestLightingMaps::OnImGuiRender(Renderer& renderer) {}
     void TestLightingMaps::OnDetach(Renderer& renderer) 
     {
-        glDisable(GL_DEPTH_TEST);
+        renderer.EnableDepthTest(false);
+        renderer.SetClearColor(renderer.GetWindowDefaultColor());
+        renderer.ClearTextures();    
         renderer.ClearTextures();
-    }
+}
 
 }

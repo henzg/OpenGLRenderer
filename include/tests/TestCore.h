@@ -6,3 +6,4 @@
 #include "tests/TestLighting.h"
 #include "tests/TestMaterials.h"
 #include "tests/TestLightingMaps.h"
+#include "tests/TestShaders.h"

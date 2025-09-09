@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "Core.h"
+#include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
 
 /* Default camera values */
@@ -32,6 +32,7 @@ private:
     float m_Yaw;
     float m_Pitch;
     float m_Zoom;
+    bool m_ScrollZoomEnabled = true;
     
     /*--- Private functions ---*/
     void UpdateCameraVectors();
@@ -55,8 +56,13 @@ public:
     float GetYaw() const { return m_Yaw; }
     float GetPitch() const { return m_Pitch; }
     float GetZoom() const { return m_Zoom; }
+    void EnableScrollZoom(bool enabled) { m_ScrollZoomEnabled = enabled;}
+    bool IsScrollEnabled() const { return m_ScrollZoomEnabled; }
 
     /*--- Member Functions ---*/
     void ProcessKeyboardActions(CameraMovement direction, float deltaTime, float speedModifier = 1);
-    void ProcessMouseScroll(float yoffset);
+    void AttachToWindow(GLFWwindow* window);
+    void DetachFromWindow(GLFWwindow* window);
+    static void GlfwScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+    void ProcessMouseScroll(double yOffset);
 };

@@ -16,11 +16,11 @@ namespace test {
     void Test3DBasics::OnAttach(Renderer& renderer)
     {
         /*--- OGL Init settings ----------------------------------------------------------------*/
-        glEnable(GL_DEPTH_TEST);        
+        renderer.EnableDepthTest(true);
         /*--- Add imgui widgets for this test -------------------------------------------------*/
         renderer.AddDevWindowWidget<ImguiSliderFloat>("Mix Value", &m_TextureMix, 0.0f, 1.0f);
         renderer.AddDevWindowWidget<ImguiSliderFloat>("FOV", &m_Fov, 25.0f, 175.0f);
-        renderer.AddDevWindowWidget<ImguiColorEdit4>("Clear Color", &m_WinColor);
+        renderer.AddDevWindowWidget<ImguiColorEdit3>("Clear Color", &m_WinColor);
         /*--- Add Shaders -------------------------------------------------------------------*/
         m_Shader = std::make_unique<Shader>(m_CubeVertexShader.c_str(), m_CubeFragmentShader.c_str());
         /*--- Add Textures ----------------------------------------------------------------*/ 
@@ -47,8 +47,8 @@ namespace test {
     void Test3DBasics::OnUpdate(float deltaTime) {}
     void Test3DBasics::OnRender(Renderer& renderer) 
     {
-        glClearColor(m_WinColor.x, m_WinColor.y, m_WinColor.z, m_WinColor.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        renderer.SetClearColor(m_WinColor);
+        
         /*--- Bind Textures ----------------------------------------------------------------*/
         Texture* tex1 = renderer.GetTexture("woodTex");
         Texture* tex2 = renderer.GetTexture("awesomeFace");
@@ -79,8 +79,9 @@ namespace test {
     }
     void Test3DBasics::OnImGuiRender(Renderer& renderer) {}
     void Test3DBasics::OnDetach(Renderer& renderer) {
-        glDisable(GL_DEPTH_TEST);
         renderer.ClearMeshes();
         renderer.ClearDevWindowWidgets();
+        renderer.EnableDepthTest(false);
+    
     }
 }

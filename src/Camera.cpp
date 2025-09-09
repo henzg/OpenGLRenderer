@@ -1,6 +1,9 @@
 #include "Camera.h"
 #include "glm/ext/quaternion_geometric.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include <unordered_map>
 
 #include <iostream>
 
@@ -11,6 +14,42 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float zoom)
 }
 
 Camera::~Camera() {}
+
+// glfw scroll control
+namespace {
+    std::unordered_map<GLFWwindow*, Camera*>& windowToCamera() {
+    static std::unordered_map<GLFWwindow*, Camera*> map;
+    return map;
+    }
+}
+
+void Camera::AttachToWindow(GLFWwindow* window) {
+    windowToCamera()[window] = this;
+    glfwSetScrollCallback(window, Camera::GlfwScrollCallback);
+}
+
+void Camera::DetachFromWindow(GLFWwindow* window) {
+    windowToCamera().erase(window);
+}
+
+void Camera::GlfwScrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
+    // preserve imgui
+    ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
+    // dont zoom while hovering widget
+    if(ImGui::GetCurrentContext() && ImGui::GetIO().WantCaptureMouse)
+        return;
+
+    auto it = windowToCamera().find(window);
+    if(it == windowToCamera().end())
+        return;
+
+    Camera* cam = it->second;
+    if (!cam || !cam->IsScrollEnabled())
+        return;
+
+    cam->ProcessMouseScroll(static_cast<float>(yOffset));
+        
+}
 
 void Camera::UpdateCameraVectors()
 {
@@ -51,11 +90,11 @@ void Camera::ProcessKeyboardActions(CameraMovement direction, float deltaTime, f
     
 }
 
-void Camera::ProcessMouseScroll(float yoffset)
+void Camera::ProcessMouseScroll(double yOffset)
 {
-    m_Zoom -= (float)yoffset;
+    m_Zoom -= (float)yOffset;
     if (m_Zoom < 1.0f)
         m_Zoom = 1.0f;
-    if (m_Zoom > 45.0f)
-        m_Zoom = 45.0f;
+    if (m_Zoom > 100.0f)
+        m_Zoom = 100.0f;
 }

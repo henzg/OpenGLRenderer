@@ -31,6 +31,7 @@ private:
     float m_LastFrame = 0.0f;
     glm::vec3 m_DefaultWinColor = {0.2f, .3f, .3f};
     glm::vec3 m_CurrentWinColor;
+    glm::vec2 m_WxHCoords;
 
     std::map<std::string, std::unique_ptr<Shader>> m_Shaders;
     std::vector<std::unique_ptr<Mesh>> m_Meshes;
@@ -57,9 +58,9 @@ public:
     void SetClearColor(glm::vec3 color);
     void SetClearColor(ImVec4 color);
 
-    
     float GetDeltaTime() const {return m_DeltaTime;}
 
+    void EnableDepthTest(bool enabled) { enabled ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); }
     /*-- Camera Manager Functions ----------------------------------------------------------*/
     glm::mat4 GetCameraViewMatrix() const { return m_Camera.GetViewMatrix(); }
     float GetCameraZoom() const { return m_Camera.GetZoom(); }

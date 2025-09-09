@@ -58,6 +58,7 @@ set(APP_SRC
     src/tests/TestLighting.cpp
     src/tests/TestLightingMaps.cpp
     src/tests/TestMaterials.cpp
+    src/tests/TestShaders.cpp
     src/tests/TestSquare.cpp
     src/tests/TestTriangle.cpp
 )

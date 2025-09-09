@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "tests/TestCore.h"
 #include "tests/TestLightingMaps.h"
+#include "tests/TestShaders.h"
 #include <GLFW/glfw3.h>
 
 Renderer::Renderer(const std::string& title, int width, int height)
@@ -11,7 +12,10 @@ Renderer::Renderer(const std::string& title, int width, int height)
       m_DevWindow(title, ImVec2(800,800), ImVec2(700,800)),
       m_Camera(),
       m_CurrentWinColor(m_DefaultWinColor)
-{}
+{
+    m_WxHCoords[0] = GetWindowWidth();
+    m_WxHCoords[1] = GetWindowHeight();
+}
 
 Renderer::~Renderer() {}
 
@@ -30,6 +34,7 @@ void Renderer::OnInit()
     m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
     m_DevWindow.RegisterTest<test::TestMaterials>("Materials");
     m_DevWindow.RegisterTest<test::TestLightingMaps>("Lighting Maps");
+    m_DevWindow.RegisterTest<test::TestShader>("Shader Art");
 }
 
 void Renderer::OnRun() {
@@ -44,6 +49,7 @@ void Renderer::OnRun() {
         float currentFrame = static_cast<float>(glfwGetTime());
         m_DeltaTime = currentFrame - m_LastFrame;
         m_LastFrame = currentFrame;
+        m_Camera.AttachToWindow(m_Window.getNativeHandler());
         ProcessInput();
         /*----------------------------------------------------------------------------------*/
         // imgui

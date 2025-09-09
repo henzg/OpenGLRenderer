@@ -14,7 +14,7 @@ namespace test
 
         void TestMaterials::OnAttach(Renderer& renderer) 
         {
-            glEnable(GL_DEPTH_TEST);
+            renderer.EnableDepthTest(true);
             renderer.AddDevWindowWidget<ImguiDragFloat3>("Light Position", &m_LightPosition, .02);
             m_CurrentMaterial.setMaterial(m_SelectedMaterial);
             
@@ -121,7 +121,7 @@ namespace test
         
         void TestMaterials::OnDetach(Renderer& renderer) 
         {
-            glDisable(GL_DEPTH_TEST);
+            renderer.EnableDepthTest(false);
         }
 
         const char* TestMaterials::GetMaterialNameString(MaterialName material)

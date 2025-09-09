@@ -2,8 +2,6 @@
 
 #include "ImguiWidget.h"
 #include "VertexBufferLayout.h"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "Renderer.h"
 
 
@@ -18,19 +16,19 @@ namespace test
         void TestLighting::OnAttach(Renderer& renderer) 
         {
 
+            renderer.EnableDepthTest(true);
+
             renderer.AddDevWindowWidget<ImguiDragFloat3>("Light Pos", &m_LightPosition, .05);
             renderer.AddDevWindowWidget<ImguiSliderFloat>("Specular", &m_SpecModify, .0f, 1.0f);
             renderer.AddDevWindowWidget<ImguiSliderFloat>("Ambient", &m_AmbientModify, .0f, 1.f);
             renderer.AddDevWindowWidget<ImguiSliderFloat>("Diffuse", &m_DiffuseModify, .0f, 1.0f);
 
-            glEnable(GL_DEPTH_TEST);
             m_ObjVAO = std::make_unique<VertexArray>();
             m_VBO = std::make_unique<VertexBuffer>(m_Verticies, sizeof(m_Verticies));
-            VertexBufferLayout cubeLayout =
-        {
-            {ShaderDataType::Float3, "aPos"},
-            {ShaderDataType::Float3, "aNormal"},
-        };
+            VertexBufferLayout cubeLayout = {
+                {ShaderDataType::Float3, "aPos"},
+                {ShaderDataType::Float3, "aNormal"},
+            };
             m_ObjVAO->AddBuffer(*m_VBO, cubeLayout);
             m_ObjVAO->Unbind();
             
@@ -82,7 +80,8 @@ namespace test
         void TestLighting::OnImGuiRender(Renderer& renderer) {}
         void TestLighting::OnDetach(Renderer& renderer) 
         {
-            glDisable(GL_DEPTH_TEST);
+            renderer.ClearDevWindowWidgets();
+            renderer.EnableDepthTest(false);
         }
 
 }
