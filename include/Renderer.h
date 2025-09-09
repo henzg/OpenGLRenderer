@@ -29,8 +29,8 @@ private:
 
     float m_DeltaTime = 0.0f;
     float m_LastFrame = 0.0f;
-    ImVec4 m_WinColor = {0.2f, 0.3f, 0.3f, 1.0f};
-
+    glm::vec3 m_DefaultWinColor = {0.2f, .3f, .3f};
+    glm::vec3 m_CurrentWinColor;
 
     std::map<std::string, std::unique_ptr<Shader>> m_Shaders;
     std::vector<std::unique_ptr<Mesh>> m_Meshes;
@@ -51,8 +51,11 @@ public:
     // RendererWindow
     int GetWindowWidth() const {return m_Window.getWidth();}
     int GetWindowHeight() const {return m_Window.getHeight();}
-    ImVec4 GetWindowDefaultColor() const {return m_WinColor;}
-    void SetWindowDefaultColor(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {m_WinColor.x = r;}
+    glm::vec3 GetWindowDefaultColor() const {return m_DefaultWinColor;}
+
+    void SetClearColor(float r, float g, float b);
+    void SetClearColor(glm::vec3 color);
+    void SetClearColor(ImVec4 color);
 
     
     float GetDeltaTime() const {return m_DeltaTime;}

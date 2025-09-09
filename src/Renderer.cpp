@@ -1,20 +1,16 @@
 #include "Renderer.h"
 
 #include "Core.h"
+#include "tests/TestCore.h"
+#include "tests/TestLightingMaps.h"
 #include <GLFW/glfw3.h>
-
-#include "tests/TestClearColor.h"
-#include "tests/TestTriangle.h"
-#include "tests/TestSquare.h"
-#include "tests/Test3DBasics.h"
-#include "tests/TestLighting.h"
-#include "tests/TestMaterials.h"
 
 Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
       m_ImGuiSystem(m_Window.getNativeHandler()),
       m_DevWindow(title, ImVec2(800,800), ImVec2(700,800)),
-      m_Camera()
+      m_Camera(),
+      m_CurrentWinColor(m_DefaultWinColor)
 {}
 
 Renderer::~Renderer() {}
@@ -23,7 +19,7 @@ void Renderer::OnInit()
 {
     /*--- OGL init settings ----------------------------------------------------------------*/
     GLClearError();
-    GLCall(glClearColor(m_WinColor.x, m_WinColor.y, m_WinColor.z, m_WinColor.w));
+    GLCall(glClearColor(m_CurrentWinColor[0], m_CurrentWinColor[1], m_CurrentWinColor[2], 1.0f));
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     /*--- Register Tests--------------------------------------------------------------------*/
      
@@ -33,6 +29,7 @@ void Renderer::OnInit()
     m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube");
     m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
     m_DevWindow.RegisterTest<test::TestMaterials>("Materials");
+    m_DevWindow.RegisterTest<test::TestLightingMaps>("Lighting Maps");
 }
 
 void Renderer::OnRun() {
@@ -41,7 +38,8 @@ void Renderer::OnRun() {
         
         /*--- per-frame logic --------------------------------------------------------------*/
         GLClearError();
-        GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
+        
+        GLCall(glClearColor(m_CurrentWinColor[0], m_CurrentWinColor[1], m_CurrentWinColor[2], 1.0));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         float currentFrame = static_cast<float>(glfwGetTime());
         m_DeltaTime = currentFrame - m_LastFrame;
@@ -63,6 +61,27 @@ void Renderer::OnRun() {
 bool Renderer::ShouldClose() const 
 {
     return m_Window.shouldClose();
+}
+
+void Renderer::SetClearColor(float r, float g, float b)
+{
+    m_CurrentWinColor[0] = r;
+    m_CurrentWinColor[1] = g;
+    m_CurrentWinColor[2] = b;
+}
+
+void Renderer::SetClearColor(glm::vec3 color)
+{
+    m_CurrentWinColor[0] = color[0];
+    m_CurrentWinColor[1] = color[1];
+    m_CurrentWinColor[2] = color[2];
+}
+
+void Renderer::SetClearColor(ImVec4 color)
+{
+    m_CurrentWinColor[0] = color.x;
+    m_CurrentWinColor[1] = color.y;
+    m_CurrentWinColor[2] = color.z;
 }
 
 /* Add a mesh to the mesh vector for rendering */

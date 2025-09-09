@@ -1,13 +1,14 @@
 #pragma once
 
 #include "tests/Test.h"
+#include "glm/glm.hpp"
 #include <string>
 
 namespace test {
     class TestClearColor : public Test
     {
     private:
-        float m_ClearColor[4];
+        glm::vec3 m_ClearColor;
         bool m_CheckboxState = false;
         float m_Time = 0.f;
         float m_Speed = 5.f;
@@ -22,7 +23,7 @@ namespace test {
         void OnImGuiRender(Renderer& renderer) override;
         void OnDetach(Renderer& renderer) override;
         
-        void ResetColor();
+        void ResetColor(Renderer& renderer);
         
     };   
 }

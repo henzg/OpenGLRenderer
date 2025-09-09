@@ -71,6 +71,19 @@ private:
 
 };
 
+class ImguiColorEdit3 : public ImguiWidget
+{
+private:
+    glm::vec3* m_Color = nullptr;
+    
+public:
+    ImguiColorEdit3(const std::string& label, glm::vec3* color)
+        : ImguiWidget(label), m_Color(color) {}
+    void Draw() override
+    {
+        ImGui::ColorEdit3(GetLabel().c_str(), (float*)m_Color);    
+    }
+};
 
 class ImguiColorEdit4 : public ImguiWidget
 {

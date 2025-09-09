@@ -31,8 +31,6 @@ namespace test
                                                      reinterpret_cast<ImVec4*>(&m_TriangleColor));
         renderer.AddDevWindowWidget<ImguiDragFloat2>("Position", &m_TriCoords, .01);
         
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     void TestTriangle::OnUpdate(float deltaTime) 
@@ -86,8 +84,7 @@ namespace test
         m_VBO->Unbind();
         m_Shader->Unbind();
         renderer.RemoveDevWindowWidget("Triangle Color");
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        renderer.SetClearColor(renderer.GetWindowDefaultColor());
         
     }
 

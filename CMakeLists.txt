@@ -56,6 +56,7 @@ set(APP_SRC
     src/tests/Test3DBasics.cpp
     src/tests/TestClearColor.cpp
     src/tests/TestLighting.cpp
+    src/tests/TestLightingMaps.cpp
     src/tests/TestMaterials.cpp
     src/tests/TestSquare.cpp
     src/tests/TestTriangle.cpp
