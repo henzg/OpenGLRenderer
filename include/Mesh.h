@@ -22,6 +22,26 @@ enum class MeshLayout
     POSITION_NORMAL_TEXCOORD,
 };
 
+enum class CubeFeature : unsigned int
+{
+    None = 0,
+    Position = 1  << 0,
+    Normal = 1 << 1,
+    TexCoord = 1 << 2,
+
+    All = Position | Normal | TexCoord
+};
+
+inline CubeFeature operator|(CubeFeature a, CubeFeature b) {
+    return static_cast<CubeFeature>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
+}
+
+inline bool operator&(CubeFeature a, CubeFeature b) {
+    return (static_cast<unsigned int>(a) & static_cast<unsigned int>(b)) !=0;
+}
+
+
+
 class Mesh {
 private:
     std::unique_ptr<VertexArray> m_VAO;
@@ -32,11 +52,14 @@ private:
     std::vector<std::shared_ptr<Texture>> m_Textures;
 
     unsigned int m_IndexCount;
+    unsigned int m_VertexCount;
 
 public:
     Mesh(const float* verticies, unsigned int numVerticies, 
          const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout);
     ~Mesh();
+
+    static std::unique_ptr<Mesh>CreateCube(CubeFeature features = CubeFeature::All);
 
     void Draw() const;
 

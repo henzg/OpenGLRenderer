@@ -109,6 +109,12 @@ public:
         CalculateOffsetsAndStride();
     }
 
+    VertexBufferLayout(const std::vector<VertexBufferElement>& elements)
+        : m_Elements(elements) 
+    {
+        CalculateOffsetsAndStride();
+    }
+
     inline const std::vector<VertexBufferElement>& GetElements() const { return m_Elements; }
     inline uint32_t GetStride() const { return m_Stride; }
 

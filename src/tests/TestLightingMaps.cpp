@@ -37,6 +37,8 @@ namespace test {
         m_LightingShader->Bind();
         renderer.AddTexture("crate", "../res/crate.png", true, true);
         renderer.AddTexture("crateSpec", "../res/crate_specular.png", true, true);
+        renderer.AddTexture("theMatrix", "../res/matrix.jpg", false, true);
+        renderer.AddTexture("coloredSpec", "../res/container2_specular_colored.png", true, true);
         m_LightingShader->setInt("material.diffuse", 0);
         m_LightingShader->setInt("material.specular", 1);
         m_LightingShader->Unbind();
@@ -48,8 +50,10 @@ namespace test {
         m_LightingShader->Bind();
         Texture* tex1 = renderer.GetTexture("crate");
         Texture* tex2 = renderer.GetTexture("crateSpec");
+        Texture* tex3 = renderer.GetTexture("theMatrix");
         if (tex1) tex1->BindandActivate(GL_TEXTURE0);
         if (tex2) tex2->BindandActivate(GL_TEXTURE1);
+        if (tex3) tex3->BindandActivate(GL_TEXTURE2);
 
         m_LightingShader->setVec3("light.ambient", m_LightAmbient);
         m_LightingShader->setVec3("light.diffuse", m_LightDiffuse);

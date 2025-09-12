@@ -36,6 +36,14 @@ public:
     {
         m_Tests.push_back(std::make_pair(name, [name](){ return std::make_unique<T>(name); }));
     }
+    
+    template<typename T>
+    void RegisterTest(const std::string& name, Renderer& renderer)
+    {
+        m_Tests.push_back(std::make_pair(name, [&renderer, name]()
+                                         {return std::make_unique<T>(name, renderer);
+                                         }));
+    }
     test::Test* GetCurrentTest() { return m_CurrentTest.get(); }
     /*--------------------------------------------------------------------------------------*/
 

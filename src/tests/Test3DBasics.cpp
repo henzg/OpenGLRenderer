@@ -32,16 +32,8 @@ namespace test {
             m_Shader->setInt("texture1", 0);
             m_Shader->setInt("texture2", 1);
         }
-        /*--- AddLayout --------------------------------------------------------------------*/
-        VertexBufferLayout cubeLayout = {
-            {ShaderDataType::Float3, "aPos"},
-            {ShaderDataType::Float2, "aTexture"}
-        };
-        /*--- Add Meshes ------------------------------------------------------------------*/    
-
-        renderer.AddMesh("mainCube", m_CubeVerticies, sizeof(m_CubeVerticies) / (5 * sizeof(float)), 
-                m_CubeIndicies, sizeof(m_CubeIndicies) / sizeof(unsigned int),
-                cubeLayout, "cubeShader", {"woodTex", "awesomeFace"});
+        /*--- Add Mesh --------------------------------------------------------------------*/
+        renderer.AddMesh("mainCube", std::move(m_Mesh));
     }   
 
     void Test3DBasics::OnUpdate(float deltaTime) {}
@@ -65,15 +57,20 @@ namespace test {
         m_Shader->setMat4("projection", projection);
         // view matrix
         m_Shader->setMat4("view", renderer.GetCameraViewMatrix());
-        const auto& meshes = renderer.GetMeshes();
-        for (size_t i = 0; i < meshes.size(); ++i)
+        const auto& mesh = renderer.GetMesh("mainCube");
+        if(mesh)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 25.0f * (float)glfwGetTime();
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            m_Shader->setMat4("model", model);
-            meshes[i]->Draw();
+        for (size_t i = 0; i < 1; ++i)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, cubePositions[i]);
+                float angle = 25.0f * (float)glfwGetTime();
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+                m_Shader->setMat4("model", model);
+                mesh->Draw();
+            }
+        } else {
+            std::cerr << "||ERROR||COULD NOT FIND MESH||\n";
         }
 
     }

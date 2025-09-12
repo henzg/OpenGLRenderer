@@ -22,7 +22,7 @@ namespace test {
         std::unique_ptr<IndexBuffer> m_IndexBuffer;
         std::unique_ptr<Shader> m_Shader;
         std::unique_ptr<Texture> m_Texture;
-        std::unique_ptr<Mesh> m_Mesh;
+        std::unique_ptr<Mesh> m_Mesh = Mesh::CreateCube(CubeFeature::Position | CubeFeature::TexCoord);
 
         std::string m_CubeVertexShader = "../shaders/Cube.vs";
         std::string m_CubeFragmentShader = "../shaders/Cube.fs";
@@ -66,7 +66,7 @@ namespace test {
             0.5f, -0.5f, -0.5f,   1.0f, 0.0f, // 21 - Bottom-right
             0.5f, -0.5f,  0.5f,   1.0f, 1.0f, // 22 - Top-right
             -0.5f, -0.5f,  0.5f,   0.0f, 1.0f  // 23 - Top-left
-    
+        
         };
 
         unsigned int m_CubeIndicies[3*12] =

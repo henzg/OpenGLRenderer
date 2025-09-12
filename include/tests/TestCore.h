@@ -7,3 +7,4 @@
 #include "tests/TestMaterials.h"
 #include "tests/TestLightingMaps.h"
 #include "tests/TestShaders.h"
+#include "tests/TestLightCaster.h"

@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include "VertexArray.h"
 #include "GeometryData.h"
 
 #include <vector>
@@ -31,10 +32,11 @@ private:
     float m_LastFrame = 0.0f;
     glm::vec3 m_DefaultWinColor = {0.2f, .3f, .3f};
     glm::vec3 m_CurrentWinColor;
-    glm::vec2 m_WxHCoords;
 
+    std::map<std::string, std::unique_ptr<VertexArray>> m_VAOs;
+    std::map<std::string, std::unique_ptr<VertexBuffer>> m_VBOs;
     std::map<std::string, std::unique_ptr<Shader>> m_Shaders;
-    std::vector<std::unique_ptr<Mesh>> m_Meshes;
+    std::map<std::string, std::unique_ptr<Mesh>> m_Meshes;
     std::map<std::string, std::unique_ptr<Texture>> m_Textures;
 
 public:
@@ -67,13 +69,27 @@ public:
     glm::vec3 GetCameraPosition() const { return m_Camera.GetPosition(); }
 
     // RendererMeshes
-    const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return m_Meshes; }
+    const Mesh* GetMesh(const std::string& name);
     int GetMeshesSize() const {return m_Meshes.size();}
     
     /*Add resources*/
+
+    /*--- Vertex Array Manager Functions------------------------------------------------------------*/
+    void AddVertexArray(const std::string& name);
+    void ClearVertexArrays();
+    VertexArray* GetVertexArray(const std::string& name);
+    void BindVertexArray(const std::string& name);
+
+    /*--- Vertex Buffer Manager Functions------------------------------------------------------------*/
+    void AddVertexBuffer(const std::string& name, const void* data, unsigned int size);
+    VertexBuffer* GetVertexBuffer(const std::string& name);
+    void ClearVertexBuffers();
+
+    /*--- Mesh Manager Functions------------------------------------------------------------*/
     void AddMesh(const std::string& name, const float* verticies, unsigned int numVerticies, 
                  const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout,
                  const std::string& shaderName, const std::vector<std::string>& textureNames);
+    void AddMesh(const std::string& name, std::unique_ptr<Mesh> mesh);
     void ClearMeshes();
 
     /*-- Shader Manger Functions------------------------------------------------------------*/
@@ -121,5 +137,7 @@ public:
     {
         m_DevWindow.DisableWidget(label);
     }
+
+    void TestRegister();
     
 };

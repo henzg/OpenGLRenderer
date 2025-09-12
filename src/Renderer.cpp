@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "tests/TestCore.h"
+#include "tests/TestLightCaster.h"
 #include "tests/TestLightingMaps.h"
 #include "tests/TestShaders.h"
 #include <GLFW/glfw3.h>
@@ -12,10 +13,7 @@ Renderer::Renderer(const std::string& title, int width, int height)
       m_DevWindow(title, ImVec2(800,800), ImVec2(700,800)),
       m_Camera(),
       m_CurrentWinColor(m_DefaultWinColor)
-{
-    m_WxHCoords[0] = GetWindowWidth();
-    m_WxHCoords[1] = GetWindowHeight();
-}
+{}
 
 Renderer::~Renderer() {}
 
@@ -26,15 +24,7 @@ void Renderer::OnInit()
     GLCall(glClearColor(m_CurrentWinColor[0], m_CurrentWinColor[1], m_CurrentWinColor[2], 1.0f));
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     /*--- Register Tests--------------------------------------------------------------------*/
-     
-    m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
-    m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test");
-    m_DevWindow.RegisterTest<test::TestSquare>("Test Square");
-    m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube");
-    m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
-    m_DevWindow.RegisterTest<test::TestMaterials>("Materials");
-    m_DevWindow.RegisterTest<test::TestLightingMaps>("Lighting Maps");
-    m_DevWindow.RegisterTest<test::TestShader>("Shader Art");
+    TestRegister(); 
 }
 
 void Renderer::OnRun() {
@@ -90,19 +80,85 @@ void Renderer::SetClearColor(ImVec4 color)
     m_CurrentWinColor[2] = color.z;
 }
 
+/* Add Vertex array to renderer lists */
+void Renderer::AddVertexArray(const std::string& name) {
+    m_VAOs.emplace(name, std::make_unique<VertexArray>());
+}
+
+VertexArray* Renderer::GetVertexArray(const std::string& name) {
+    auto it = m_VAOs.find(name);
+
+    if(it != m_VAOs.end()) {
+        if(it->second->IsValid())
+            return it->second.get(); 
+    }
+    std::cerr << "ERROR||COULD NOT FIND VAO||" << name << "||\n";
+    return nullptr;
+}
+
+void Renderer::BindVertexArray(const std::string& name)
+{
+    VertexArray* vao = GetVertexArray(name);
+    vao->Bind();
+}
+
+void Renderer::ClearVertexArrays() {
+    m_VAOs.clear();
+}
+
+// delete a selected vao - to add if needed
+//void Renderer::RemoveVertexArray(const std::string& name)
+
+/* Add Vertex Buffer to renderer map */
+void Renderer::AddVertexBuffer(const std::string& name, const void* data, unsigned int size) {
+    m_VBOs.emplace(name, std::make_unique<VertexBuffer>(data, size));
+}
+
+VertexBuffer* Renderer::GetVertexBuffer(const std::string& name) {
+    auto it = m_VBOs.find(name);
+    if(it != m_VBOs.end()) {
+        if(it->second->IsValid())
+            return it->second.get();
+    }
+    std::cerr << "ERROR||COULD NOT FIND VBO||"<< name << "||\n";
+    return nullptr;
+}
+
+
+void Renderer::ClearVertexBuffers() {
+    m_VBOs.clear();
+}
+
 /* Add a mesh to the mesh vector for rendering */
 void Renderer::AddMesh(const std::string& name, const float* verticies, unsigned int numVerticies, 
                        const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout,
                        const std::string& shaderName, const std::vector<std::string>& textureNames)
 {
-    m_Meshes.push_back(std::make_unique<Mesh>(verticies, numVerticies, indicies, numIndicies, layout));
+    m_Meshes.emplace(name, std::make_unique<Mesh>(verticies, numVerticies, indicies, numIndicies, layout));
+}
+
+void Renderer::AddMesh(const std::string& name, std::unique_ptr<Mesh> mesh)
+{
+    m_Meshes.emplace(name, std::move(mesh));
+    if(GetMesh(name) == nullptr)
+        std::cerr << "mesh failed to load";
+}
+
+const Mesh* Renderer::GetMesh(const std::string& name)
+{
+    auto it = m_Meshes.find(name);
+    if(it!= m_Meshes.end())
+    {
+        return it->second.get();
+    }
+    std::cerr << "ERROR||MESH||COULD NOT FIND MESH||" << name << "||\n";
+    return nullptr;
 }
 
 void Renderer::ClearMeshes()
 {
     m_Meshes.clear();
 }
-
 
 /* Add a shader to the Shader map to use for rendering. Has a unique name, and shader object */
 void Renderer::AddShader(const std::string& name, const std::string& vsPath, const std::string& fsPath)
@@ -154,6 +210,20 @@ void Renderer::ProcessInput()
         m_Camera.ProcessKeyboardActions(Camera::CameraMovement::DOWN, m_DeltaTime);
 }
 
+void Renderer::TestRegister() {
+
+    m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
+    m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test");
+    m_DevWindow.RegisterTest<test::TestSquare>("Test Square");
+    m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube");
+    m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
+    m_DevWindow.RegisterTest<test::TestMaterials>("Materials");
+    m_DevWindow.RegisterTest<test::TestLightingMaps>("Lighting Maps");
+    m_DevWindow.RegisterTest<test::TestLightCaster>("Light Casters", *this);
+    m_DevWindow.RegisterTest<test::TestShader>("Shader Art Bonus");
+}
+
 void Renderer::OnCleanup() {
     glfwTerminate();
 }
+

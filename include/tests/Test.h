@@ -21,6 +21,7 @@ public:
     virtual void OnDetach(Renderer& renderer) {}
 
     const std::string GetName() { return m_Name; }
+    void TestCleanup();
 };
 /*End of test namespace---------------------------------------------------------------------*/
 }
