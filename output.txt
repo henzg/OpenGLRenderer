@@ -1,0 +1,26 @@
+Element info: || elementcomponentcount: 3 || Normalized: 0 || Stride 24 || offset: 0
+Element info: || elementcomponentcount: 3 || Normalized: 0 || Stride 24 || offset: 12
+Element info: || elementcomponentcount: 3 || Normalized: 0 || Stride 24 || offset: 0
+Element info: || elementcomponentcount: 3 || Normalized: 0 || Stride 24 || offset: 12
+ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ
+ERROR::SHADER::PROGRAM::LINKING_FAILED
+Vertex info
+-----------
+(0) : error C5145: must write to gl_Position
+
+ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ
+ERROR::SHADER::PROGRAM::LINKING_FAILED
+Vertex info
+-----------
+(0) : error C5145: must write to gl_Position
+
+Element info: || elementcomponentcount: 3 || Normalized: 0 || Stride 20 || offset: 0
+Element info: || elementcomponentcount: 2 || Normalized: 0 || Stride 20 || offset: 12
+ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ
+ERROR::SHADER::PROGRAM::LINKING_FAILED
+Vertex info
+-----------
+(0) : error C5145: must write to gl_Position
+
+IMAGE::LOAD::FAILED::TEXTURE
+IMAGE::LOAD::FAILED::TEXTURE
