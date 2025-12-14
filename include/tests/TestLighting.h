@@ -14,11 +14,16 @@ namespace test
     class TestLighting : public Test
     {
     private:
-        std::unique_ptr<VertexArray> m_ObjVAO;
-        std::unique_ptr<VertexArray> m_LightVAO;
-        std::unique_ptr<VertexBuffer> m_VBO;
-        std::unique_ptr<Shader> m_LightingShader;
-        std::unique_ptr<Shader> m_LightCubeShader;
+        ResourceManager* m_ResourceManager = nullptr;
+        VertexArray* m_ObjVAO = nullptr;
+        VertexArray* m_LightVAO = nullptr;
+        VertexBuffer* m_VBO = nullptr;
+        Shader* m_LightingShader = nullptr;
+        Shader* m_LightCubeShader = nullptr;
+        Texture* m_ContainerTex = nullptr;
+        Texture* m_ContainerSpec = nullptr;
+        const Mesh* m_CubeMesh = nullptr;
+        const Mesh* m_LightCubeMesh = nullptr;
 
         std::string m_LightingColorVS = "../shaders/Lighting.vs";
         std::string m_LightingColorFS = "../shaders/Lighting.fs";
@@ -79,10 +84,10 @@ namespace test
             -0.5f,  0.5f, -0.5f, 0.f, 1.f, 0.f
         };
     public:
-        TestLighting(const std::string& name);
+        TestLighting(const std::string& name, ResourceManager& resourceManager, Scene& scene);
         ~TestLighting();
-        
-        void OnAttach(Renderer& renderer) override;
+
+        void OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) override;
         void OnUpdate(float deltaTime) override;
         void OnRender(Renderer& renderer) override;
         void OnImGuiRender(Renderer& renderer) override;

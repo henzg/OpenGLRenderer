@@ -7,49 +7,95 @@
 #include "tests/TestShaders.h"
 #include <GLFW/glfw3.h>
 
+/* Renderer Class */
+/* INFO: The main backend to the application. */
+
+/* Renderer constructor - App name, win width, win height
+    ImGuiSystem inits
+    DevWindow inits
+    Camera inits
+    Sets default wincolor as current wincolor
+*/
 Renderer::Renderer(const std::string& title, int width, int height)
     : m_Window(title, width, height), 
       m_ImGuiSystem(m_Window.getNativeHandler()),
       m_DevWindow(title, ImVec2(800,800), ImVec2(700,800)),
       m_Camera(),
+      m_ResourceManager(),
+      m_Scene(),
+      m_InputManager(m_Window.getNativeHandler(), m_Camera),
       m_CurrentWinColor(m_DefaultWinColor)
 {}
 
+/* Renderer deconstructor - defaults nothing fancy */
 Renderer::~Renderer() {}
 
+/* When the render inits, run the following function
+ * Sets glclearcolor, and clears buffer_bit and depth_buffer_bit 
+ * Registers all tests that has been loaded */
 void Renderer::OnInit() 
 {
     /*--- OGL init settings ----------------------------------------------------------------*/
     GLClearError();
+    EnableDepthTest(true);
     GLCall(glClearColor(m_CurrentWinColor[0], m_CurrentWinColor[1], m_CurrentWinColor[2], 1.0f));
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     /*--- Register Tests--------------------------------------------------------------------*/
     TestRegister(); 
 }
 
+/* While the renderer is running do this function */
 void Renderer::OnRun() {
     while (!ShouldClose())
     {
-        
         /*--- per-frame logic --------------------------------------------------------------*/
         GLClearError();
-        
-        GLCall(glClearColor(m_CurrentWinColor[0], m_CurrentWinColor[1], m_CurrentWinColor[2], 1.0));
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         float currentFrame = static_cast<float>(glfwGetTime());
         m_DeltaTime = currentFrame - m_LastFrame;
         m_LastFrame = currentFrame;
-        m_Camera.AttachToWindow(m_Window.getNativeHandler());
-        ProcessInput();
+
+        if (m_DevWindow.GetCurrentTest()) {
+            m_DevWindow.GetCurrentTest()->OnUpdate(m_DeltaTime);
+        }
+
+        GLCall(glClearColor(m_CurrentWinColor[0], m_CurrentWinColor[1], m_CurrentWinColor[2], 1.0));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Allow the active test to draw after clearing.
+        if (m_DevWindow.GetCurrentTest()) {
+            m_DevWindow.GetCurrentTest()->OnRender(*this);
+        }
+
+        OnRender(m_Scene); // Render objects from the scene
+
         /*----------------------------------------------------------------------------------*/
         // imgui
         m_ImGuiSystem.begin_frame();
-        m_DevWindow.Draw(m_Window.getWidth(), m_Window.getHeight(), *this, m_DeltaTime);
+        m_DevWindow.Draw(m_Window.getWidth(), m_Window.getHeight(), *this, m_DeltaTime, m_Scene);
         m_ImGuiSystem.end_frame();
+
+        m_InputManager.Update(m_DeltaTime); // Update input after ImGui has processed events
 
         // swap buffers and pollevents
         m_Window.swapBuffers();
         m_Window.pollEvents();
+    }
+}
+
+void Renderer::OnRender(Scene& scene)
+{
+    // Update camera and process input (will be moved to InputManager later)
+    // These are now handled by the InputManager
+
+    // Render all renderable objects in the scene
+    glm::mat4 view = scene.GetCamera().GetViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(scene.GetCamera().GetZoom()), 
+                                            (float)m_Window.getWidth() / (float)m_Window.getHeight(), 0.1f, 100.f);
+
+    for (const auto& renderable : scene.GetRenderables())
+    {
+        renderable->Draw(*this, view, projection);
     }
 }
 
@@ -80,148 +126,37 @@ void Renderer::SetClearColor(ImVec4 color)
     m_CurrentWinColor[2] = color.z;
 }
 
-/* Add Vertex array to renderer lists */
-void Renderer::AddVertexArray(const std::string& name) {
-    m_VAOs.emplace(name, std::make_unique<VertexArray>());
-}
-
-VertexArray* Renderer::GetVertexArray(const std::string& name) {
-    auto it = m_VAOs.find(name);
-
-    if(it != m_VAOs.end()) {
-        if(it->second->IsValid())
-            return it->second.get(); 
-    }
-    std::cerr << "ERROR||COULD NOT FIND VAO||" << name << "||\n";
-    return nullptr;
-}
-
-void Renderer::BindVertexArray(const std::string& name)
-{
-    VertexArray* vao = GetVertexArray(name);
-    vao->Bind();
-}
-
-void Renderer::ClearVertexArrays() {
-    m_VAOs.clear();
-}
-
-// delete a selected vao - to add if needed
-//void Renderer::RemoveVertexArray(const std::string& name)
-
-/* Add Vertex Buffer to renderer map */
-void Renderer::AddVertexBuffer(const std::string& name, const void* data, unsigned int size) {
-    m_VBOs.emplace(name, std::make_unique<VertexBuffer>(data, size));
-}
-
-VertexBuffer* Renderer::GetVertexBuffer(const std::string& name) {
-    auto it = m_VBOs.find(name);
-    if(it != m_VBOs.end()) {
-        if(it->second->IsValid())
-            return it->second.get();
-    }
-    std::cerr << "ERROR||COULD NOT FIND VBO||"<< name << "||\n";
-    return nullptr;
-}
 
 
-void Renderer::ClearVertexBuffers() {
-    m_VBOs.clear();
-}
 
-/* Add a mesh to the mesh vector for rendering */
-void Renderer::AddMesh(const std::string& name, const float* verticies, unsigned int numVerticies, 
-                       const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout,
-                       const std::string& shaderName, const std::vector<std::string>& textureNames)
-{
-    m_Meshes.emplace(name, std::make_unique<Mesh>(verticies, numVerticies, indicies, numIndicies, layout));
-}
 
-void Renderer::AddMesh(const std::string& name, std::unique_ptr<Mesh> mesh)
-{
-    m_Meshes.emplace(name, std::move(mesh));
-    if(GetMesh(name) == nullptr)
-        std::cerr << "mesh failed to load";
-}
 
-const Mesh* Renderer::GetMesh(const std::string& name)
-{
-    auto it = m_Meshes.find(name);
-    if(it!= m_Meshes.end())
-    {
-        return it->second.get();
-    }
-    std::cerr << "ERROR||MESH||COULD NOT FIND MESH||" << name << "||\n";
-    return nullptr;
-}
 
-void Renderer::ClearMeshes()
-{
-    m_Meshes.clear();
-}
 
-/* Add a shader to the Shader map to use for rendering. Has a unique name, and shader object */
-void Renderer::AddShader(const std::string& name, const std::string& vsPath, const std::string& fsPath)
-{
-    m_Shaders.emplace(name, std::make_unique<Shader>(vsPath.c_str(), fsPath.c_str()));
-}
 
-Shader* Renderer::GetShader(const std::string& name)
-{
-    auto it = m_Shaders.find(name);
-    if (it != m_Shaders.end())
-        if (it->second->IsValid())
-            return it->second.get();
-    std::cout << "ERROR||FIND||SHADER||" << name << "||NOT FOUND||\n";
-    return nullptr;
-}
 
-void Renderer::AddTexture(const std::string& name, const std::string& filePath, bool flip_on_load, bool hasAlpha)
-{
-    std::unique_ptr<Texture> newTexture = std::make_unique<Texture>();
-    newTexture->LoadFromFile(filePath, flip_on_load, hasAlpha);
-    m_Textures.emplace(name, std::move(newTexture));
-}
 
-Texture* Renderer::GetTexture(const std::string& name)
-{
-    auto it = m_Textures.find(name);
-    if (it != m_Textures.end())
-        return it->second.get();
-    std::cout << "ERROR||FIND||TEXTURE||" << name << "||NOT FOUND||\n";
-    return nullptr;
-}
 
-void Renderer::ProcessInput()
-{
-    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(m_Window.getNativeHandler(), true);
-    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_A) == GLFW_PRESS)
-        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::LEFT, m_DeltaTime);
-    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_E) == GLFW_PRESS)
-        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::BACKWARD, m_DeltaTime);
-    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_D) == GLFW_PRESS)
-        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::RIGHT, m_DeltaTime);
-    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_Q) == GLFW_PRESS)
-        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::FORWARD, m_DeltaTime);
-    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_W) == GLFW_PRESS)
-       m_Camera.ProcessKeyboardActions(Camera::CameraMovement::UP, m_DeltaTime);
-    if(glfwGetKey(m_Window.getNativeHandler(), GLFW_KEY_S) == GLFW_PRESS)
-        m_Camera.ProcessKeyboardActions(Camera::CameraMovement::DOWN, m_DeltaTime);
-}
+
+
+
+
+
+
 
 void Renderer::TestRegister() {
 
-    m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test");
-    m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test");
-    m_DevWindow.RegisterTest<test::TestSquare>("Test Square");
-    m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube");
-    m_DevWindow.RegisterTest<test::TestLighting>("Lighting");
-    m_DevWindow.RegisterTest<test::TestMaterials>("Materials");
-    m_DevWindow.RegisterTest<test::TestLightingMaps>("Lighting Maps");
-    m_DevWindow.RegisterTest<test::TestLightCaster>("Light Casters", *this);
-    m_DevWindow.RegisterTest<test::TestShader>("Shader Art Bonus");
+    m_DevWindow.RegisterTest<test::TestClearColor>("Clear Color Test", m_ResourceManager, m_Scene);
+    m_DevWindow.RegisterTest<test::TestTriangle>("Triangle Test", m_ResourceManager, m_Scene);
+    m_DevWindow.RegisterTest<test::TestSquare>("Test Square", m_ResourceManager, m_Scene);
+    m_DevWindow.RegisterTest<test::Test3DBasics>("A Cube", m_ResourceManager, m_Scene);
+    m_DevWindow.RegisterTest<test::TestLighting>("Lighting", m_ResourceManager, m_Scene);
+    m_DevWindow.RegisterTest<test::TestMaterials>("Materials", m_ResourceManager, m_Scene);
+    m_DevWindow.RegisterTest<test::TestLightingMaps>("Lighting Maps", m_ResourceManager, m_Scene);
+    //m_DevWindow.RegisterTest<test::TestLightCaster>("Light Casters", *this);
+    m_DevWindow.RegisterTest<test::TestShader>("Shader Art Bonus", m_ResourceManager, m_Scene);
 }
+
 
 void Renderer::OnCleanup() {
     glfwTerminate();

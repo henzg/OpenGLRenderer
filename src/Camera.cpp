@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float zoom)
-    : m_CameraPosition(position), m_CameraFront(glm::vec3(0.0f, 0.0f, -1.0f)), m_WorldUp(up), m_Zoom(zoom)
+Camera::Camera(glm::vec3 position, glm::vec3 up, float zoom, float yaw, float pitch)
+    : m_CameraPosition(position), m_WorldUp(up), m_Yaw(yaw), m_Pitch(pitch), m_Zoom(zoom), m_CameraFront(glm::vec3(0.0f, 0.0f, -1.0f))
 {
     UpdateCameraVectors();
 }
@@ -16,39 +16,25 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float zoom)
 Camera::~Camera() {}
 
 // glfw scroll control
-namespace {
-    std::unordered_map<GLFWwindow*, Camera*>& windowToCamera() {
-    static std::unordered_map<GLFWwindow*, Camera*> map;
-    return map;
+void Camera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)
+{
+    xoffset *= m_Sensitivity;
+    yoffset *= m_Sensitivity;
+
+    m_Yaw   += xoffset;
+    m_Pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (constrainPitch)
+    {
+        if (m_Pitch > 89.0f)
+            m_Pitch = 89.0f;
+        if (m_Pitch < -89.0f)
+            m_Pitch = -89.0f;
     }
-}
 
-void Camera::AttachToWindow(GLFWwindow* window) {
-    windowToCamera()[window] = this;
-    glfwSetScrollCallback(window, Camera::GlfwScrollCallback);
-}
-
-void Camera::DetachFromWindow(GLFWwindow* window) {
-    windowToCamera().erase(window);
-}
-
-void Camera::GlfwScrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
-    // preserve imgui
-    ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
-    // dont zoom while hovering widget
-    if(ImGui::GetCurrentContext() && ImGui::GetIO().WantCaptureMouse)
-        return;
-
-    auto it = windowToCamera().find(window);
-    if(it == windowToCamera().end())
-        return;
-
-    Camera* cam = it->second;
-    if (!cam || !cam->IsScrollEnabled())
-        return;
-
-    cam->ProcessMouseScroll(static_cast<float>(yOffset));
-        
+    // update Front, Right and Up Vectors using the updated Euler angles
+    UpdateCameraVectors();
 }
 
 void Camera::UpdateCameraVectors()

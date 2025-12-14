@@ -6,14 +6,14 @@
 
 namespace test {
 
-TestClearColor::TestClearColor(const std::string& name)
-    : Test(name), m_ClearColor{ 0.2f, 0.3f, 0.3f }
+TestClearColor::TestClearColor(const std::string& name, ResourceManager& resourceManager, Scene& scene)
+    : Test(name, resourceManager, scene), m_ClearColor{ 0.2f, 0.3f, 0.3f }
 {}
 
 TestClearColor::~TestClearColor()
 {}
 
-void TestClearColor::OnAttach(Renderer& renderer)
+void TestClearColor::OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene)
 {
     // Add the widget when the test becomes active
     renderer.AddDevWindowWidget<ImguiColorEdit3>("Clear Color", reinterpret_cast<glm::vec3*>(&m_ClearColor)); // Cast float[4] to ImVec4*
@@ -34,6 +34,7 @@ void TestClearColor::OnUpdate(float deltaTime)
 
 void TestClearColor::OnRender(Renderer& renderer) 
 {
+    // Apply clear color while active (takes effect on next frame's clear).
     renderer.SetClearColor(m_ClearColor);
 }
 

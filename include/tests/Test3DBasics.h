@@ -20,9 +20,10 @@ namespace test {
         std::unique_ptr<VertexBuffer> m_VBO;
         std::unique_ptr<VertexArray> m_VAO;
         std::unique_ptr<IndexBuffer> m_IndexBuffer;
-        std::unique_ptr<Shader> m_Shader;
+        Shader* m_Shader = nullptr;
         std::unique_ptr<Texture> m_Texture;
-        std::unique_ptr<Mesh> m_Mesh = Mesh::CreateCube(CubeFeature::Position | CubeFeature::TexCoord);
+        const Mesh* m_Mesh = nullptr;
+        Scene* m_Scene = nullptr; // unused for now
 
         std::string m_CubeVertexShader = "../shaders/Cube.vs";
         std::string m_CubeFragmentShader = "../shaders/Cube.fs";
@@ -95,10 +96,10 @@ namespace test {
         glm::vec3 m_WinColor = {.2f, 0.3f, .3f};
 
     public:
-        Test3DBasics(const std::string& name);
+        Test3DBasics(const std::string& name, ResourceManager& resourceManager, Scene& scene);
         ~Test3DBasics();
         
-        void OnAttach(Renderer& renderer) override;
+        void OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) override;
         void OnUpdate(float deltaTime) override;
         void OnRender(Renderer& renderer) override;
         void OnImGuiRender(Renderer& renderer) override;

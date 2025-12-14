@@ -45,8 +45,11 @@ set(APP_SRC
     src/ElementArray.cpp
     src/ImGuiSystem.cpp
     src/IndexBuffer.cpp
+    src/InputManager.cpp
     src/Mesh.cpp
     src/Renderer.cpp
+    src/ResourceManager.cpp
+    src/Scene.cpp
     src/Texture.cpp
     src/VertexArray.cpp
     src/VertexBuffer.cpp

@@ -14,11 +14,12 @@
 #include "Mesh.h"
 #include "VertexArray.h"
 #include "GeometryData.h"
+#include "Scene.h" // Include Scene.h
+#include "InputManager.h" // Include InputManager.h
 
-#include <vector>
-#include <memory>
-#include <map>
 #include <string>
+#include <memory>
+#include "ResourceManager.h" // Include the new resource manager
 
 class Renderer
 {
@@ -27,17 +28,14 @@ private:
     ImGuiSystem m_ImGuiSystem;
     DeveloperWindow m_DevWindow;
     Camera m_Camera;
+    ResourceManager m_ResourceManager; // Instance of the new resource manager
+    Scene m_Scene; // Instance of the scene
+    InputManager m_InputManager; // Instance of the Input Manager
 
     float m_DeltaTime = 0.0f;
     float m_LastFrame = 0.0f;
     glm::vec3 m_DefaultWinColor = {0.2f, .3f, .3f};
     glm::vec3 m_CurrentWinColor;
-
-    std::map<std::string, std::unique_ptr<VertexArray>> m_VAOs;
-    std::map<std::string, std::unique_ptr<VertexBuffer>> m_VBOs;
-    std::map<std::string, std::unique_ptr<Shader>> m_Shaders;
-    std::map<std::string, std::unique_ptr<Mesh>> m_Meshes;
-    std::map<std::string, std::unique_ptr<Texture>> m_Textures;
 
 public:
     Renderer(const std::string& title, int width, int height);
@@ -47,8 +45,8 @@ public:
     void OnInit();
     void OnUpdate(float deltaTime);
     void OnRun(); //main loop
+    void OnRender(Scene& scene);
     void OnCleanup();
-    void ProcessInput();
 
     /*Getters/Setters*/
     // RendererWindow
@@ -68,43 +66,9 @@ public:
     float GetCameraZoom() const { return m_Camera.GetZoom(); }
     glm::vec3 GetCameraPosition() const { return m_Camera.GetPosition(); }
 
-    // RendererMeshes
-    const Mesh* GetMesh(const std::string& name);
-    int GetMeshesSize() const {return m_Meshes.size();}
-    
-    /*Add resources*/
-
-    /*--- Vertex Array Manager Functions------------------------------------------------------------*/
-    void AddVertexArray(const std::string& name);
-    void ClearVertexArrays();
-    VertexArray* GetVertexArray(const std::string& name);
-    void BindVertexArray(const std::string& name);
-
-    /*--- Vertex Buffer Manager Functions------------------------------------------------------------*/
-    void AddVertexBuffer(const std::string& name, const void* data, unsigned int size);
-    VertexBuffer* GetVertexBuffer(const std::string& name);
-    void ClearVertexBuffers();
-
-    /*--- Mesh Manager Functions------------------------------------------------------------*/
-    void AddMesh(const std::string& name, const float* verticies, unsigned int numVerticies, 
-                 const unsigned int* indicies, unsigned int numIndicies, const VertexBufferLayout& layout,
-                 const std::string& shaderName, const std::vector<std::string>& textureNames);
-    void AddMesh(const std::string& name, std::unique_ptr<Mesh> mesh);
-    void ClearMeshes();
-
-    /*-- Shader Manger Functions------------------------------------------------------------*/
-    void AddShader(const std::string& name, const std::string& vsPath, const std::string& fsPath);
-    Shader* GetShader(const std::string& name);
-    void ClearShaders();
-    
-    /*--- Texture Manger Functions ---------------------------------------------------------*/
-    void AddTexture(const std::string& name, const std::string& filePath, bool flip_on_load, bool hasRGBA);
-    Texture* GetTexture(const std::string& name);
-    //void RemoveTexture(const std::string& name);
-    void ClearTextures()
-    {
-        m_Textures.clear();
-    }
+    /*--- Resource Manager Accessors -------------------------------------------------------*/
+    ResourceManager& GetResourceManager() { return m_ResourceManager; }
+    const ResourceManager& GetResourceManager() const { return m_ResourceManager; }
 
     bool ShouldClose() const;
 
@@ -137,6 +101,19 @@ public:
     {
         m_DevWindow.DisableWidget(label);
     }
+    InputManager& GetInputManager() { return m_InputManager; }
+
+    /*--- ImGuiSystem Accessors ------------------------------------------------------------*/
+    ImGuiSystem& GetImGuiSystem() { return m_ImGuiSystem; }
+    const ImGuiSystem& GetImGuiSystem() const { return m_ImGuiSystem; }
+
+    /*--- DeveloperWindow Accessors --------------------------------------------------------*/
+    DeveloperWindow& GetDevWindow() { return m_DevWindow; }
+    const DeveloperWindow& GetDevWindow() const { return m_DevWindow; }
+
+    /*--- Window Accessors -----------------------------------------------------------------*/
+    Window& GetWindow() { return m_Window; }
+    const Window& GetWindow() const { return m_Window; }
 
     void TestRegister();
     

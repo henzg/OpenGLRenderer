@@ -2,6 +2,7 @@
 
 #include "ImguiWidget.h"
 #include "tests/Test.h"
+#include "Scene.h"
 
 #include <string>
 #include <memory>
@@ -14,7 +15,7 @@ public:
     DeveloperWindow(const std::string& title,ImVec2 initialPos, ImVec2 initialSize);
     ~DeveloperWindow() = default;
     
-    void Draw(int mainWindowWidth, int mainWindowHeight, Renderer& renderer, float deltaTime);
+    void Draw(int mainWindowWidth, int mainWindowHeight, Renderer& renderer, float deltaTime, Scene& scene);
 
     /*--- Utilities for Widgets-------------------------------------------------------------*/
     template<typename T, typename... Args>
@@ -23,6 +24,7 @@ public:
         m_Widgets.push_back(std::make_unique<T>(std::forward<Args>(args)...));    
     }
     void RemoveWidget(const std::string& label);
+    test::Test* GetCurrentTest() const;
     void ClearWidgets();
 
     void EnableWidget(const std::string& label);
@@ -32,16 +34,10 @@ public:
     /*--------------------------------------------------------------------------------------*/
     /*--- Utilities for Tests---------------------------------------------------------------*/
     template<typename T>
-    void RegisterTest(const std::string& name)
+    void RegisterTest(const std::string& name, ResourceManager& resourceManager, Scene& scene)
     {
-        m_Tests.push_back(std::make_pair(name, [name](){ return std::make_unique<T>(name); }));
-    }
-    
-    template<typename T>
-    void RegisterTest(const std::string& name, Renderer& renderer)
-    {
-        m_Tests.push_back(std::make_pair(name, [&renderer, name]()
-                                         {return std::make_unique<T>(name, renderer);
+        m_Tests.push_back(std::make_pair(name, [&resourceManager, &scene, name]()
+                                         {return std::make_unique<T>(name, resourceManager, scene);
                                          }));
     }
     test::Test* GetCurrentTest() { return m_CurrentTest.get(); }

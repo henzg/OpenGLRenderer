@@ -8,12 +8,12 @@
 #include "glm/ext/matrix_transform.hpp"
 
 namespace test {
-    Test3DBasics::Test3DBasics(const std::string& name)
-        : Test(name)
+    Test3DBasics::Test3DBasics(const std::string& name, ResourceManager& resourceManager, Scene& scene)
+        : Test(name, resourceManager, scene)
     {}
     Test3DBasics::~Test3DBasics(){}
     
-    void Test3DBasics::OnAttach(Renderer& renderer)
+    void Test3DBasics::OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene)
     {
         /*--- OGL Init settings ----------------------------------------------------------------*/
         renderer.EnableDepthTest(true);
@@ -22,18 +22,20 @@ namespace test {
         renderer.AddDevWindowWidget<ImguiSliderFloat>("FOV", &m_Fov, 25.0f, 175.0f);
         renderer.AddDevWindowWidget<ImguiColorEdit3>("Clear Color", &m_WinColor);
         /*--- Add Shaders -------------------------------------------------------------------*/
-        m_Shader = std::make_unique<Shader>(m_CubeVertexShader.c_str(), m_CubeFragmentShader.c_str());
+        resourceManager.AddShader("CubeShader", m_CubeVertexShader, m_CubeFragmentShader);
+        m_Shader = resourceManager.GetShader("CubeShader");
         /*--- Add Textures ----------------------------------------------------------------*/ 
-        renderer.AddTexture("woodTex", "../res/wood.png", false, false);
-        renderer.AddTexture("awesomeFace", "../res/awesomeface.png", true, true);
+        resourceManager.AddTexture("woodTex", "../res/wood.png", false, false);
+        resourceManager.AddTexture("awesomeFace", "../res/awesomeface.png", true, true);
         if(m_Shader)
         {
             m_Shader->Bind();
             m_Shader->setInt("texture1", 0);
             m_Shader->setInt("texture2", 1);
         }
-        /*--- Add Mesh --------------------------------------------------------------------*/
-        renderer.AddMesh("mainCube", std::move(m_Mesh));
+        /*--- Create mesh managed by ResourceManager ----------------------------------------------*/
+        resourceManager.AddMesh("BasicsCube", Mesh::CreateCube(CubeFeature::Position | CubeFeature::TexCoord));
+        m_Mesh = resourceManager.GetMesh("BasicsCube");
     }   
 
     void Test3DBasics::OnUpdate(float deltaTime) {}
@@ -42,8 +44,8 @@ namespace test {
         renderer.SetClearColor(m_WinColor);
         
         /*--- Bind Textures ----------------------------------------------------------------*/
-        Texture* tex1 = renderer.GetTexture("woodTex");
-        Texture* tex2 = renderer.GetTexture("awesomeFace");
+        Texture* tex1 = renderer.GetResourceManager().GetTexture("woodTex");
+        Texture* tex2 = renderer.GetResourceManager().GetTexture("awesomeFace");
         if (tex1) tex1->BindandActivate(GL_TEXTURE0);
         if (tex2) tex2->BindandActivate(GL_TEXTURE1);        
         /*--- Activate Shaders and Matrixes-------------------------------------------------*/
@@ -56,29 +58,24 @@ namespace test {
                                                     0.1f, 100.0f);
         m_Shader->setMat4("projection", projection);
         // view matrix
-        m_Shader->setMat4("view", renderer.GetCameraViewMatrix());
-        const auto& mesh = renderer.GetMesh("mainCube");
-        if(mesh)
-        {
-        for (size_t i = 0; i < 1; ++i)
-            {
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, cubePositions[i]);
-                float angle = 25.0f * (float)glfwGetTime();
-                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                m_Shader->setMat4("model", model);
-                mesh->Draw();
-            }
-        } else {
-            std::cerr << "||ERROR||COULD NOT FIND MESH||\n";
-        }
+        glm::mat4 view = renderer.GetCameraViewMatrix();
+        m_Shader->setMat4("view", view);
+
+        // model matrix
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, s_CubePositions[0]);
+        float angle = 25.0f * (float)glfwGetTime();
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        m_Shader->setMat4("model", model);
+
+        if (m_Mesh)
+            m_Mesh->Draw(renderer, view, projection);
 
     }
     void Test3DBasics::OnImGuiRender(Renderer& renderer) {}
     void Test3DBasics::OnDetach(Renderer& renderer) {
-        renderer.ClearMeshes();
         renderer.ClearDevWindowWidgets();
         renderer.EnableDepthTest(false);
-    
+        m_Mesh = nullptr;
     }
 }

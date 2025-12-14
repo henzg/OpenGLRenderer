@@ -14,18 +14,20 @@ namespace test
     class TestSquare : public Test
     {
     private:
-        std::unique_ptr<VertexArray> m_VAO;
-        std::unique_ptr<VertexBuffer> m_VBO;
-        std::unique_ptr<IndexBuffer> m_IndexBuffer;
-        std::unique_ptr<Shader> m_Shader;
-        std::unique_ptr<Texture> m_Texture;
+        ResourceManager* m_ResourceManager = nullptr;
+        VertexArray* m_VAO = nullptr;
+        VertexBuffer* m_VBO = nullptr;
+        IndexBuffer* m_IndexBuffer = nullptr;
+        Shader* m_Shader = nullptr;
+        Texture* m_Texture1 = nullptr;
+        Texture* m_Texture2 = nullptr;
 
         float m_SquareVerticies[5*4] = 
         {
-            .5f,   .5f, 1.f, 1.f, 1.f, // 0 3fpos, 2ftex
-            .5f,  -.5f, 1.f, 1.f, 0.f, // 1
-            -.5f, -.5f, 1.f, 0.f, 0.f, // 2
-            -.5f,  .5f, 1.f, 0.f, 1.f  // 3
+            .5f,   .5f, 0.f, 1.f, 1.f, // 0 3fpos, 2ftex
+            .5f,  -.5f, 0.f, 1.f, 0.f, // 1
+            -.5f, -.5f, 0.f, 0.f, 0.f, // 2
+            -.5f,  .5f, 0.f, 0.f, 1.f  // 3
         };
         const unsigned int m_SquareIndicies[3*2] =
         {
@@ -40,10 +42,10 @@ namespace test
         bool m_ShowWireFrame = false;
         float m_TextureMix = 0.f;
     public:
-        TestSquare(const std::string& name);
+        TestSquare(const std::string& name, ResourceManager& resourceManager, Scene& scene);
         ~TestSquare();
 
-        void OnAttach(Renderer& renderer) override;
+        void OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) override;
         void OnUpdate(float deltaTime) override;
         void OnRender(Renderer& render) override;
         void OnImGuiRender(Renderer& renderer) override;

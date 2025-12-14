@@ -1,5 +1,5 @@
 #include "DeveloperWindow.h"
-//#include "Renderer.h"
+#include "Renderer.h" // Include the full definition of Renderer
 
 DeveloperWindow::DeveloperWindow(const std::string& title,ImVec2 initialPos, ImVec2 initialSize) 
     : m_Title(title), m_Position(initialPos), m_Size(initialSize) 
@@ -9,7 +9,7 @@ DeveloperWindow::DeveloperWindow(const std::string& title,ImVec2 initialPos, ImV
 }
 
 
-void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& renderer, float deltaTime)
+void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& renderer, float deltaTime, Scene& scene)
 {
 
     float panelWidth = 300.0f;
@@ -48,8 +48,6 @@ void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& 
                     }
             }
             m_CurrentTest->OnImGuiRender(renderer);
-            m_CurrentTest->OnUpdate(deltaTime); // openGL update/render methods
-            m_CurrentTest->OnRender(renderer); 
         }
     }
     else // no test is active display the menu
@@ -59,10 +57,12 @@ void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& 
         {
             if(ImGui::Button(testPair.first.c_str()))
             {
-                if(m_CurrentTest)
+                if(m_CurrentTest) {
                     m_CurrentTest->OnDetach(renderer);
+                    ClearWidgets();
+                }
                 m_CurrentTest = testPair.second(); // create and activate the new test
-                m_CurrentTest->OnAttach(renderer);
+                m_CurrentTest->OnAttach(renderer, renderer.GetResourceManager(), scene);
             }
         }
     }
@@ -121,6 +121,8 @@ void DeveloperWindow::RemoveWidget(const std::string& label)
     });
     m_Widgets.erase(it, m_Widgets.end());
 }
+
+test::Test* DeveloperWindow::GetCurrentTest() const { return m_CurrentTest.get(); }
 
 
 

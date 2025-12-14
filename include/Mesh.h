@@ -42,7 +42,9 @@ inline bool operator&(CubeFeature a, CubeFeature b) {
 
 
 
-class Mesh {
+#include "IRenderable.h"
+
+class Mesh : public IRenderable {
 private:
     std::unique_ptr<VertexArray> m_VAO;
     std::unique_ptr<VertexBuffer> m_VBO;
@@ -50,6 +52,7 @@ private:
     
     std::shared_ptr<Shader> m_Shader;
     std::vector<std::shared_ptr<Texture>> m_Textures;
+    VertexBufferLayout* m_Layout;
 
     unsigned int m_IndexCount;
     unsigned int m_VertexCount;
@@ -61,6 +64,7 @@ public:
 
     static std::unique_ptr<Mesh>CreateCube(CubeFeature features = CubeFeature::All);
 
-    void Draw() const;
+
+    void Draw(const Renderer& renderer, const glm::mat4& view, const glm::mat4& projection) const override;
 
 };

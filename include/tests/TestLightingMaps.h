@@ -11,12 +11,16 @@
 namespace test {
     class TestLightingMaps : public Test {
 private:
-    std::unique_ptr<VertexArray> m_ObjVAO;
-    std::unique_ptr<VertexArray> m_LightVAO;
-    std::unique_ptr<VertexBuffer> m_VBO;
-    std::unique_ptr<Shader> m_LightingShader;
-    std::unique_ptr<Shader> m_LightCubeShader;
-    std::unique_ptr<Texture> m_Texture;
+    ResourceManager* m_ResourceManager = nullptr;
+    VertexArray* m_ObjVAO = nullptr;
+    VertexArray* m_LightVAO = nullptr;
+    VertexBuffer* m_VBO = nullptr;
+    Shader* m_LightingShader = nullptr;
+    Shader* m_LightCubeShader = nullptr;
+    Texture* m_DiffuseMap = nullptr;
+    Texture* m_SpecularMap = nullptr;
+    const Mesh* m_CubeMesh = nullptr;
+    const Mesh* m_LightCubeMesh = nullptr;
     
     std::string m_LightingMapVS;
     std::string m_LightingMapFS;
@@ -77,11 +81,10 @@ private:
     };
 
 public:
-    TestLightingMaps(const std::string& name);
+    TestLightingMaps(const std::string& name, ResourceManager& resourceManager, Scene& scene);
     ~TestLightingMaps() = default;
 
-
-    void OnAttach(Renderer& renderer) override;
+    void OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) override;
     void OnUpdate(float deltaTime) override;
     void OnRender(Renderer& renderer) override;
     void OnImGuiRender(Renderer& renderer) override;

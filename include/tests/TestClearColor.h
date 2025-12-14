@@ -14,10 +14,10 @@ namespace test {
         float m_Speed = 5.f;
         bool m_PartyTime = false;
     public:
-        TestClearColor(const std::string& name);
+        TestClearColor(const std::string& name, ResourceManager& resourceManager, Scene& scene);
         ~TestClearColor();
 
-        void OnAttach(Renderer& renderer) override;
+        void OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) override;
         void OnUpdate(float deltaTime) override;
         void OnRender(Renderer& renderer) override;
         void OnImGuiRender(Renderer& renderer) override;

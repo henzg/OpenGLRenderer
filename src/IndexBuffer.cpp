@@ -23,3 +23,8 @@ void IndexBuffer::Unbind() const
 {
     glBindBuffer(m_BufferType, 0);
 }
+
+bool IndexBuffer::IsValid() const
+{
+    return m_RendererID != 0;
+}

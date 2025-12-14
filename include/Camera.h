@@ -38,7 +38,7 @@ private:
     void UpdateCameraVectors();
 
 public:
-    Camera(glm::vec3 position = DefaultCameraPosition, glm::vec3 up = DefaultCameraUp, float zoom = DefaultZoom);
+    Camera(glm::vec3 position = DefaultCameraPosition, glm::vec3 up = DefaultCameraUp, float zoom = DefaultZoom, float yaw = DefaultYaw, float pitch = DefaultPitch);
     ~Camera();
 
     enum class CameraMovement {
@@ -61,8 +61,6 @@ public:
 
     /*--- Member Functions ---*/
     void ProcessKeyboardActions(CameraMovement direction, float deltaTime, float speedModifier = 1);
-    void AttachToWindow(GLFWwindow* window);
-    void DetachFromWindow(GLFWwindow* window);
-    static void GlfwScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+    void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     void ProcessMouseScroll(double yOffset);
 };

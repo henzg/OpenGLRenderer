@@ -10,11 +10,14 @@ namespace test
     class TestMaterials : public Test
     {
     private:
-        std::unique_ptr<VertexArray> m_ObjVAO;
-        std::unique_ptr<VertexArray> m_LightVAO;
-        std::unique_ptr<VertexBuffer> m_VBO;
-        std::unique_ptr<Shader> m_LightingShader;
-        std::unique_ptr<Shader> m_LightCubeShader;
+        ResourceManager* m_ResourceManager = nullptr;
+        VertexArray* m_ObjVAO = nullptr;
+        VertexArray* m_LightVAO = nullptr;
+        VertexBuffer* m_VBO = nullptr;
+        Shader* m_LightingShader = nullptr;
+        Shader* m_LightCubeShader = nullptr;
+        const Mesh* m_CubeMesh = nullptr;
+        const Mesh* m_LightCubeMesh = nullptr;
 
         std::string m_LightingColorVS = "../shaders/MaterialLighting.vs";
         std::string m_LightingColorFS = "../shaders/MaterialLighting.fs";
@@ -78,10 +81,10 @@ namespace test
         static int GetMaterialCount();
 
     public:
-        TestMaterials(const std::string& name);
+        TestMaterials(const std::string& name, ResourceManager& resourceManager, Scene& scene);
         ~TestMaterials();
 
-        void OnAttach(Renderer& renderer) override;
+        void OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) override;
         void OnUpdate(float deltaTime) override;
         void OnRender(Renderer& renderer) override;
         void OnImGuiRender(Renderer& renderer) override;

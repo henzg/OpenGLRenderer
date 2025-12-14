@@ -7,34 +7,48 @@
 namespace test
 {
 
-        TestMaterials::TestMaterials(const std::string& name)
-            : Test(name)
-        {}
+        TestMaterials::TestMaterials(const std::string& name, ResourceManager& resourceManager, Scene& scene)
+        : Test(name, resourceManager, scene), m_ResourceManager(&resourceManager) {}
         TestMaterials::~TestMaterials() {}
 
-        void TestMaterials::OnAttach(Renderer& renderer) 
+        void TestMaterials::OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) 
         {
             renderer.EnableDepthTest(true);
             renderer.AddDevWindowWidget<ImguiDragFloat3>("Light Position", &m_LightPosition, .02);
             m_CurrentMaterial.setMaterial(m_SelectedMaterial);
             
-            m_ObjVAO = std::make_unique<VertexArray>();
-            m_VBO = std::make_unique<VertexBuffer>(m_Verticies, sizeof(m_Verticies));
+            m_ResourceManager->AddVertexArray("ObjVAO");
+            m_ResourceManager->AddVertexBuffer("VBO", m_Verticies, sizeof(m_Verticies));
             VertexBufferLayout cubeLayout =
             {
                 {ShaderDataType::Float3, "aPos"},
                 {ShaderDataType::Float3, "aNormal"},
             };
             
-            m_ObjVAO->AddBuffer(*m_VBO, cubeLayout);
-            m_ObjVAO->Unbind();
+            m_ResourceManager->GetVertexArray("ObjVAO")->AddBuffer(*m_ResourceManager->GetVertexBuffer("VBO"), cubeLayout);
+            m_ResourceManager->AddVertexArray("LightVAO");
+            m_ResourceManager->GetVertexArray("LightVAO")->AddBuffer(*m_ResourceManager->GetVertexBuffer("VBO"), cubeLayout);
 
-            m_LightVAO = std::make_unique<VertexArray>();
-            m_LightVAO->AddBuffer(*m_VBO, cubeLayout);
-            m_LightVAO->Unbind();
+            m_ResourceManager->AddShader("MaterialLightingShader", m_LightingColorVS.c_str(), m_LightingColorFS.c_str());
+            m_ResourceManager->AddShader("CoreLightShader", m_LightCubeVS.c_str(), m_LightCubeFS.c_str());
 
-            m_LightingShader = std::make_unique<Shader>(m_LightingColorVS.c_str(), m_LightingColorFS.c_str());
-            m_LightCubeShader = std::make_unique<Shader>(m_LightCubeVS.c_str(), m_LightCubeFS.c_str());
+            m_ResourceManager->AddMesh("Cube", Mesh::CreateCube(CubeFeature::Position | CubeFeature::Normal));
+            m_ResourceManager->AddMesh("LightCube", Mesh::CreateCube(CubeFeature::Position));
+
+            m_ObjVAO = m_ResourceManager->GetVertexArray("ObjVAO");
+            m_LightVAO = m_ResourceManager->GetVertexArray("LightVAO");
+            m_VBO = m_ResourceManager->GetVertexBuffer("VBO");
+            m_LightingShader = m_ResourceManager->GetShader("MaterialLightingShader");
+            m_LightCubeShader = m_ResourceManager->GetShader("CoreLightShader");
+            m_CubeMesh = m_ResourceManager->GetMesh("Cube");
+            m_LightCubeMesh = m_ResourceManager->GetMesh("LightCube");
+
+            if (m_LightingShader)
+            {
+                m_LightingShader->Bind();
+                m_LightingShader->setInt("material.diffuse", 0);
+                m_LightingShader->setInt("material.specular", 1);
+            }
 
         }
 
@@ -65,7 +79,7 @@ namespace test
             m_LightingShader->setMat4("model", model);
 
             m_ObjVAO->Bind();
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            m_CubeMesh->Draw(renderer, view, projection);
             m_ObjVAO->Unbind();
         
             m_LightCubeShader->Bind();
@@ -78,7 +92,7 @@ namespace test
             m_LightCubeShader->setMat4("model", model);
 
             m_LightVAO->Bind();
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            m_LightCubeMesh->Draw(renderer, view, projection);
             
         }
         void TestMaterials::OnImGuiRender(Renderer& renderer) 
@@ -122,6 +136,10 @@ namespace test
         void TestMaterials::OnDetach(Renderer& renderer) 
         {
             renderer.EnableDepthTest(false);
+            m_ResourceManager->ClearVertexArrays();
+            m_ResourceManager->ClearVertexBuffers();
+            m_ResourceManager->ClearShaders();
+            m_ResourceManager->ClearMeshes();
         }
 
         const char* TestMaterials::GetMaterialNameString(MaterialName material)

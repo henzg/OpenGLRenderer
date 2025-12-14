@@ -3,21 +3,22 @@
 #include "Renderer.h"
 
 namespace test {
-    TestLightingMaps::TestLightingMaps(const std::string& name) 
-        : Test(name) {}
+    TestLightingMaps::TestLightingMaps(const std::string& name, ResourceManager& resourceManager, Scene& scene)
+        : Test(name, resourceManager, scene), m_ResourceManager(&resourceManager) {}
 
-    void TestLightingMaps::OnAttach(Renderer& renderer) 
+    void TestLightingMaps::OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene) 
     {
         renderer.EnableDepthTest(true);
         renderer.AddDevWindowWidget<ImguiDragFloat3>("Light Position", &m_LightPosition, .008f);
         renderer.AddDevWindowWidget<ImguiDragFloat3>("Rotation", &m_CubeRotation, .05f);
-        std::string m_LightingMapVS = "../shaders/LightingMaps.vs";
-        std::string m_LightingMapFS = "../shaders/LightingMaps.fs";
-        std::string m_LightCubeVS   = "../shaders/LightCubeMaps.vs";
-        std::string m_LightCubeFS   = "../shaders/LightCubeMaps.fs";
 
-        m_VBO = std::make_unique<VertexBuffer>(m_Verticies, sizeof(m_Verticies));
-        m_ObjVAO = std::make_unique<VertexArray>();
+        m_LightingMapVS = "../shaders/LightingMaps.vs";
+        m_LightingMapFS = "../shaders/LightingMaps.fs";
+        m_LightCubeVS   = "../shaders/LightCubeMaps.vs";
+        m_LightCubeFS   = "../shaders/LightCubeMaps.fs";
+
+        m_ResourceManager->AddVertexBuffer("VBO", m_Verticies, sizeof(m_Verticies));
+        m_ResourceManager->AddVertexArray("ObjVAO");
         
         VertexBufferLayout cubeLayout = {
             {ShaderDataType::Float3, "aPos"},
@@ -25,35 +26,43 @@ namespace test {
             {ShaderDataType::Float2, "aTexture"},
         };
 
-        m_ObjVAO->AddBuffer(*m_VBO, cubeLayout);
-        m_ObjVAO->Unbind();
-        m_LightVAO = std::make_unique<VertexArray>();
-        m_LightVAO->AddBuffer(*m_VBO, cubeLayout);
-        m_LightVAO->Unbind();
+        m_ResourceManager->GetVertexArray("ObjVAO")->AddBuffer(*m_ResourceManager->GetVertexBuffer("VBO"), cubeLayout);
+        m_ResourceManager->AddVertexArray("LightVAO");
+        m_ResourceManager->GetVertexArray("LightVAO")->AddBuffer(*m_ResourceManager->GetVertexBuffer("VBO"), cubeLayout);
 
-        m_LightingShader = std::make_unique<Shader>(m_LightingMapVS.c_str(), m_LightingMapFS.c_str());
-        m_LightCubeShader = std::make_unique<Shader>(m_LightCubeVS.c_str(), m_LightCubeFS.c_str());
+        m_ResourceManager->AddShader("LightingShader", m_LightingMapVS, m_LightingMapFS);
+        m_ResourceManager->AddShader("LightCubeShader", m_LightCubeVS, m_LightCubeFS);
     
-        m_LightingShader->Bind();
-        renderer.AddTexture("crate", "../res/crate.png", true, true);
-        renderer.AddTexture("crateSpec", "../res/crate_specular.png", true, true);
-        renderer.AddTexture("theMatrix", "../res/matrix.jpg", false, true);
-        renderer.AddTexture("coloredSpec", "../res/container2_specular_colored.png", true, true);
-        m_LightingShader->setInt("material.diffuse", 0);
-        m_LightingShader->setInt("material.specular", 1);
-        m_LightingShader->Unbind();
+        m_ResourceManager->AddTexture("ContainerDiffuse", "../res/crate.png", true, true);
+        m_ResourceManager->AddTexture("ContainerSpecular", "../res/crate_specular.png", true, true);
+        
+        m_ResourceManager->AddMesh("Cube", Mesh::CreateCube(CubeFeature::Position | CubeFeature::Normal | CubeFeature::TexCoord));
+        m_ResourceManager->AddMesh("LightCube", Mesh::CreateCube(CubeFeature::Position));
+
+        m_VBO = m_ResourceManager->GetVertexBuffer("VBO");
+        m_ObjVAO = m_ResourceManager->GetVertexArray("ObjVAO");
+        m_LightVAO = m_ResourceManager->GetVertexArray("LightVAO");
+        m_LightingShader = m_ResourceManager->GetShader("LightingShader");
+        m_LightCubeShader = m_ResourceManager->GetShader("LightCubeShader");
+        m_DiffuseMap = m_ResourceManager->GetTexture("ContainerDiffuse");
+        m_SpecularMap = m_ResourceManager->GetTexture("ContainerSpecular");
+        m_CubeMesh = m_ResourceManager->GetMesh("Cube");
+        m_LightCubeMesh = m_ResourceManager->GetMesh("LightCube");
+
+        if(m_LightingShader)
+        {
+            m_LightingShader->Bind();
+            m_LightingShader->setInt("material.diffuse", 0);
+            m_LightingShader->setInt("material.specular", 1);
+        }
     }
     void TestLightingMaps::OnUpdate(float deltaTime) {}
     void TestLightingMaps::OnRender(Renderer& renderer) 
     {
         renderer.SetClearColor(0.1f, 0.1f, 0.1f);
         m_LightingShader->Bind();
-        Texture* tex1 = renderer.GetTexture("crate");
-        Texture* tex2 = renderer.GetTexture("crateSpec");
-        Texture* tex3 = renderer.GetTexture("theMatrix");
-        if (tex1) tex1->BindandActivate(GL_TEXTURE0);
-        if (tex2) tex2->BindandActivate(GL_TEXTURE1);
-        if (tex3) tex3->BindandActivate(GL_TEXTURE2);
+        m_DiffuseMap->BindandActivate(GL_TEXTURE0);
+        m_SpecularMap->BindandActivate(GL_TEXTURE1);
 
         m_LightingShader->setVec3("light.ambient", m_LightAmbient);
         m_LightingShader->setVec3("light.diffuse", m_LightDiffuse);
@@ -74,7 +83,7 @@ namespace test {
         m_LightingShader->setMat4("model", model);
 
         m_ObjVAO->Bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        m_CubeMesh->Draw(renderer, view, projection);
         m_ObjVAO->Unbind();
     
         m_LightCubeShader->Bind();
@@ -87,15 +96,18 @@ namespace test {
         m_LightCubeShader->setMat4("model", model);
 
         m_LightVAO->Bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        m_LightCubeMesh->Draw(renderer, view, projection);
     }
     void TestLightingMaps::OnImGuiRender(Renderer& renderer) {}
     void TestLightingMaps::OnDetach(Renderer& renderer) 
     {
         renderer.EnableDepthTest(false);
         renderer.SetClearColor(renderer.GetWindowDefaultColor());
-        renderer.ClearTextures();    
-        renderer.ClearTextures();
+        m_ResourceManager->ClearTextures();    
+        m_ResourceManager->ClearVertexArrays();
+        m_ResourceManager->ClearVertexBuffers();
+        m_ResourceManager->ClearShaders();
+        m_ResourceManager->ClearMeshes();
 }
 
 }

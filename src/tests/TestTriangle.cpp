@@ -7,25 +7,30 @@
 #include "imgui/imgui.h"
 namespace test
 {
-    TestTriangle::TestTriangle(const std::string& name)
-        : Test(name), m_TriangleColor(1.0, 0.5, 0.2, 1.0)
-    {}
+TestTriangle::TestTriangle(const std::string& name, ResourceManager& resourceManager, Scene& scene)
+    : Test(name, resourceManager, scene), m_ResourceManager(&resourceManager), m_TriangleColor(1.0, 0.5, 0.2, 1.0)
+{}
 
     TestTriangle::~TestTriangle() {}
 
-    void TestTriangle::OnAttach(Renderer& renderer)
+    void TestTriangle::OnAttach(Renderer& renderer, ResourceManager& resourceManager, Scene& scene)
     {
-
-        m_VAO = std::make_unique<VertexArray>();
-        m_VBO = std::make_unique<VertexBuffer>(m_Verticies, sizeof(m_Verticies));
-        m_Shader = std::make_unique<Shader>(m_VertexShaderPath, m_FragmentShaderPath);
+        m_ResourceManager->AddVertexArray("TriangleVAO");
+        m_ResourceManager->AddVertexBuffer("TriangleVBO", m_Verticies, sizeof(m_Verticies));
         
         VertexBufferLayout layout = 
         {
             {ShaderDataType::Float3, "aPos"},
         };
 
-        m_VAO->AddBuffer(*m_VBO, layout);
+        m_ResourceManager->GetVertexArray("TriangleVAO")->AddBuffer(*m_ResourceManager->GetVertexBuffer("TriangleVBO"), layout);
+        m_ResourceManager->AddIndexBuffer("TriangleEBO", m_TriangleIndicies, 3);
+        m_ResourceManager->AddShader("BasicShader", m_VertexShaderPath, m_FragmentShaderPath);
+
+        m_VAO = m_ResourceManager->GetVertexArray("TriangleVAO");
+        m_VBO = m_ResourceManager->GetVertexBuffer("TriangleVBO");
+        m_IndexBuffer = m_ResourceManager->GetIndexBuffer("TriangleEBO");
+        m_Shader = m_ResourceManager->GetShader("BasicShader");
 
         renderer.AddDevWindowWidget<ImguiColorEdit4>("Triangle Color",
                                                      reinterpret_cast<ImVec4*>(&m_TriangleColor));
@@ -51,10 +56,22 @@ namespace test
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         m_VAO->Bind();
+        m_IndexBuffer->Bind();
         m_Shader->Bind();
         m_Shader->setVec4("TriangleColor", m_TriangleColor);
         m_Shader->setVec2("triPos", m_TriCoords);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // Calculate matrices (Model, View, Projection)
+        glm::mat4 projection = glm::perspective(glm::radians(renderer.GetCameraZoom()), 
+                                                (float)renderer.GetWindowWidth() / (float)renderer.GetWindowHeight(), 0.1f, 100.f);
+        glm::mat4 view = renderer.GetCameraViewMatrix();
+        glm::mat4 model = glm::mat4(1.0f); // Simple identity model matrix for now
+
+        m_Shader->setMat4("projection", projection);
+        m_Shader->setMat4("view", view);
+        m_Shader->setMat4("model", model);
+
+        glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
         
     }
     void TestTriangle::OnImGuiRender(Renderer& renderer) {
@@ -80,12 +97,14 @@ namespace test
     }
     void TestTriangle::OnDetach(Renderer& renderer) 
     {
-        m_VAO->Unbind();
-        m_VBO->Unbind();
-        m_Shader->Unbind();
         renderer.RemoveDevWindowWidget("Triangle Color");
         renderer.SetClearColor(renderer.GetWindowDefaultColor());
-        
+        renderer.RemoveDevWindowWidget("Position");
+        m_ResourceManager->ClearVertexArrays();
+        m_ResourceManager->ClearVertexBuffers();
+        m_ResourceManager->ClearIndexBuffers();
+        m_ResourceManager->ClearShaders();
+
     }
 
 

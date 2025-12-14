@@ -127,8 +127,11 @@ std::unique_ptr<Mesh> Mesh::CreateCube(CubeFeature features)
         return std::make_unique<Mesh>(finalVertices.data(), NUM_LOGICAL_CUBE_VERTICES, nullptr, 0, layout);
 }
 
-void Mesh::Draw() const
+void Mesh::Draw(const Renderer& renderer, const glm::mat4& view, const glm::mat4& projection) const
 {
+    // Assuming the shader is already bound and uniforms are set by the caller
+    // If not, you'd need a way to get the active shader and set uniforms here.
+    // For now, we'll assume the shader (and model matrix) are handled externally.
     m_VAO->Bind();
     if(m_IndexCount > 0) 
     {
