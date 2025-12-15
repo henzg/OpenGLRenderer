@@ -1,11 +1,9 @@
 #pragma once
 
 #include "tests/Test.h"
-#include "VertexBuffer.h"
-#include "VertexArray.h"
-#include "IndexBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Mesh.h"
 
 #include <memory>
 
@@ -15,9 +13,7 @@ namespace test
     {
     private:
         ResourceManager* m_ResourceManager = nullptr;
-        VertexArray* m_VAO = nullptr;
-        VertexBuffer* m_VBO = nullptr;
-        IndexBuffer* m_IndexBuffer = nullptr;
+        const Mesh* m_Mesh = nullptr;
         Shader* m_Shader = nullptr;
         Texture* m_Texture1 = nullptr;
         Texture* m_Texture2 = nullptr;

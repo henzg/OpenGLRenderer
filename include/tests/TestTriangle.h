@@ -2,8 +2,7 @@
 
 #include "tests/Test.h"
 #include "Shader.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
+#include "Mesh.h"
 #include "glm/glm.hpp"
 
 #include <memory>
@@ -14,9 +13,7 @@ namespace test
     {
     private:
     ResourceManager* m_ResourceManager = nullptr;
-    VertexArray* m_VAO = nullptr;
-    VertexBuffer* m_VBO = nullptr;
-    IndexBuffer* m_IndexBuffer = nullptr;
+    const Mesh* m_Mesh = nullptr;
     Shader* m_Shader = nullptr;
     const char* m_VertexShaderPath = "../shaders/Basic.vs";
     const char* m_FragmentShaderPath = "../shaders/Basic.fs";

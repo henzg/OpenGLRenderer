@@ -17,6 +17,7 @@ public:
     ~InputManager() = default;
 
     void Update(float deltaTime);
+    void ResetMouseLook();
 
     // Static callback for GLFW
     static void GlfwScrollCallback(GLFWwindow* window, double xOffset, double yOffset);

@@ -26,6 +26,9 @@ public:
     ResourceManager() = default;
     ~ResourceManager() = default;
 
+    // Clear all managed GPU resources (use on test switch/back)
+    void Reset();
+
     /*--- Vertex Array Manager Functions------------------------------------------------------------*/
     void AddVertexArray(const std::string& name);
     void ClearVertexArrays();
@@ -57,5 +60,6 @@ public:
     /*--- Texture Manger Functions ---------------------------------------------------------*/
     void AddTexture(const std::string& name, const std::string& filePath, bool flip_on_load, bool hasRGBA);
     Texture* GetTexture(const std::string& name);
+    Texture* GetTexture(const std::string& name) const;
     void ClearTextures();
 };

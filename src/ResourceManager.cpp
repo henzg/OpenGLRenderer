@@ -1,6 +1,17 @@
 #include "ResourceManager.h"
 #include <iostream>
 
+void ResourceManager::Reset()
+{
+    // Clear in a predictable order
+    ClearTextures();
+    ClearMeshes();
+    ClearShaders();
+    ClearIndexBuffers();
+    ClearVertexBuffers();
+    ClearVertexArrays();
+}
+
 /*--- Vertex Array Manager Functions------------------------------------------------------------*/
 void ResourceManager::AddVertexArray(const std::string& name) {
     m_VAOs.emplace(name, std::make_unique<VertexArray>());
@@ -113,6 +124,14 @@ void ResourceManager::AddTexture(const std::string& name, const std::string& fil
 }
 
 Texture* ResourceManager::GetTexture(const std::string& name) {
+    auto it = m_Textures.find(name);
+    if (it != m_Textures.end())
+        return it->second.get();
+    std::cout << "ERROR||FIND||TEXTURE||" << name << "||NOT FOUND||\n";
+    return nullptr;
+}
+
+Texture* ResourceManager::GetTexture(const std::string& name) const {
     auto it = m_Textures.find(name);
     if (it != m_Textures.end())
         return it->second.get();

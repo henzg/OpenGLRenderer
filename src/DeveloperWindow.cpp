@@ -31,6 +31,10 @@ void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& 
             m_CurrentTest->OnDetach(renderer);
             m_CurrentTest.reset(); // deactive the current test if button is pressed
             ClearWidgets();
+            scene.Reset();
+            renderer.ResetCamera();
+            renderer.GetResourceManager().Reset();
+            renderer.ResetGLStateDefaults();
         }
         if(m_CurrentTest)
         {
@@ -60,6 +64,10 @@ void DeveloperWindow::Draw(int mainWindowWidth, int mainWindowHeight, Renderer& 
                 if(m_CurrentTest) {
                     m_CurrentTest->OnDetach(renderer);
                     ClearWidgets();
+                    scene.Reset();
+                    renderer.ResetCamera();
+                    renderer.GetResourceManager().Reset();
+                    renderer.ResetGLStateDefaults();
                 }
                 m_CurrentTest = testPair.second(); // create and activate the new test
                 m_CurrentTest->OnAttach(renderer, renderer.GetResourceManager(), scene);

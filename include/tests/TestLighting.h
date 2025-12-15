@@ -5,8 +5,6 @@
 #include "glm/glm.hpp"
 #include <memory>
 
-#include "VertexArray.h"
-#include "VertexBuffer.h"
 #include "Shader.h"
 
 namespace test
@@ -15,13 +13,8 @@ namespace test
     {
     private:
         ResourceManager* m_ResourceManager = nullptr;
-        VertexArray* m_ObjVAO = nullptr;
-        VertexArray* m_LightVAO = nullptr;
-        VertexBuffer* m_VBO = nullptr;
         Shader* m_LightingShader = nullptr;
         Shader* m_LightCubeShader = nullptr;
-        Texture* m_ContainerTex = nullptr;
-        Texture* m_ContainerSpec = nullptr;
         const Mesh* m_CubeMesh = nullptr;
         const Mesh* m_LightCubeMesh = nullptr;
 
@@ -38,51 +31,6 @@ namespace test
         bool m_DisableLighting = false;
 
         glm::vec3 m_LightPosition = {1.2f, 1.0f, 2.0f};
-        float m_Verticies[6*36] = 
-        {
-            // pos[0:2] normal[3:5]
-            -0.5f, -0.5f, -0.5f, 0.f, 0.0f, -1.0f, 
-             0.5f, -0.5f, -0.5f, 0.f, 0.0f, -1.0f, 
-             0.5f,  0.5f, -0.5f, 0.f, 0.0f, -1.0f, 
-             0.5f,  0.5f, -0.5f, 0.f, 0.0f, -1.0f,
-            -0.5f,  0.5f, -0.5f, 0.f, 0.0f, -1.0f,
-            -0.5f, -0.5f, -0.5f, 0.f, 0.0f, -1.0f,
-
-            -0.5f, -0.5f,  0.5f, 0.f, 0.f, 1.f, 
-             0.5f, -0.5f,  0.5f, 0.f, 0.f, 1.f,
-             0.5f,  0.5f,  0.5f, 0.f, 0.f, 1.f, 
-             0.5f,  0.5f,  0.5f, 0.f, 0.f, 1.f,
-            -0.5f,  0.5f,  0.5f, 0.f, 0.f, 1.f,
-            -0.5f, -0.5f,  0.5f, 0.f, 0.f, 1.f,
-
-            -0.5f,  0.5f,  0.5f, -1.f, 0.f, 0.f, 
-            -0.5f,  0.5f, -0.5f, -1.f, 0.f, 0.f,
-            -0.5f, -0.5f, -0.5f, -1.f, 0.f, 0.f,
-            -0.5f, -0.5f, -0.5f, -1.f, 0.f, 0.f,
-            -0.5f, -0.5f,  0.5f, -1.f, 0.f, 0.f,
-            -0.5f,  0.5f,  0.5f, -1.f, 0.f, 0.f,
-
-             0.5f,  0.5f,  0.5f, 1.f, 0.f, 0.f,   
-             0.5f,  0.5f, -0.5f, 1.f, 0.f, 0.f, 
-             0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f, 
-             0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f, 
-             0.5f, -0.5f,  0.5f, 1.f, 0.f, 0.f, 
-             0.5f,  0.5f,  0.5f, 1.f, 0.f, 0.f, 
-
-            -0.5f, -0.5f, -0.5f, 0.f, -1.f, 0.f, 
-             0.5f, -0.5f, -0.5f, 0.f, -1.f, 0.f, 
-             0.5f, -0.5f,  0.5f, 0.f, -1.f, 0.f, 
-             0.5f, -0.5f,  0.5f, 0.f, -1.f, 0.f, 
-            -0.5f, -0.5f,  0.5f, 0.f, -1.f, 0.f, 
-            -0.5f, -0.5f, -0.5f, 0.f, -1.f, 0.f, 
-
-            -0.5f,  0.5f, -0.5f, 0.f, 1.f, 0.f, 
-             0.5f,  0.5f, -0.5f, 0.f, 1.f, 0.f, 
-             0.5f,  0.5f,  0.5f, 0.f, 1.f, 0.f, 
-             0.5f,  0.5f,  0.5f, 0.f, 1.f, 0.f, 
-            -0.5f,  0.5f,  0.5f, 0.f, 1.f, 0.f,
-            -0.5f,  0.5f, -0.5f, 0.f, 1.f, 0.f
-        };
     public:
         TestLighting(const std::string& name, ResourceManager& resourceManager, Scene& scene);
         ~TestLighting();

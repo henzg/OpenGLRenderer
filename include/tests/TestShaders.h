@@ -1,11 +1,8 @@
 #pragma once
 
 #include "tests/Test.h"
-#include "VertexBuffer.h"
-#include "VertexArray.h"
-#include "IndexBuffer.h"
 #include "Shader.h"
-#include "Texture.h"
+#include "Mesh.h"
 
 #include <memory>
 
@@ -15,12 +12,8 @@ namespace test
     {
     private:
         ResourceManager* m_ResourceManager = nullptr;
-        VertexArray* m_VAO = nullptr;
-        VertexBuffer* m_VBO = nullptr;
-        IndexBuffer* m_IndexBuffer = nullptr;
         Shader* m_Shader = nullptr;
-        Texture* m_Texture = nullptr;
-        const Mesh* m_SquareMesh = nullptr;
+        const Mesh* m_Mesh = nullptr;
 
         glm::vec3 m_DcOffset= glm::vec3(0.6704, 0.871, .189);
         glm::vec3 m_Amp     = glm::vec3(1.163, -0.171, -2.949);

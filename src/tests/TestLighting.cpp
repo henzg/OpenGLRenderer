@@ -1,7 +1,6 @@
 #include "tests/TestLighting.h"
 
 #include "ImguiWidget.h"
-#include "VertexBufferLayout.h"
 #include "Renderer.h"
 
 
@@ -22,24 +21,9 @@ void TestLighting::OnAttach(Renderer& renderer, ResourceManager& resourceManager
             renderer.AddDevWindowWidget<ImguiSliderFloat>("Specular", &m_SpecModify, .0f, 1.0f);
             renderer.AddDevWindowWidget<ImguiSliderFloat>("Ambient", &m_AmbientModify, .0f, 1.f);
             renderer.AddDevWindowWidget<ImguiSliderFloat>("Diffuse", &m_DiffuseModify, .0f, 1.0f);
-
-            m_ResourceManager->AddVertexArray("ObjVAO");
-            m_ResourceManager->AddVertexBuffer("ObjVBO", m_Verticies, sizeof(m_Verticies));
-            VertexBufferLayout cubeLayout = {
-                {ShaderDataType::Float3, "aPos"},
-                {ShaderDataType::Float3, "aNormal"},
-            };
-            m_ResourceManager->GetVertexArray("ObjVAO")->AddBuffer(*m_ResourceManager->GetVertexBuffer("ObjVBO"), cubeLayout);
-            
-            m_ResourceManager->AddVertexArray("LightVAO");
-            m_ResourceManager->GetVertexArray("LightVAO")->AddBuffer(*m_ResourceManager->GetVertexBuffer("ObjVBO"), cubeLayout);
             
             m_ResourceManager->AddShader("LightingShader", m_LightingColorVS.c_str(), m_LightingColorFS.c_str());
             m_ResourceManager->AddShader("LightCubeShader", m_LightCubeVS.c_str(), m_LightCubeFS.c_str());
-
-            m_ObjVAO = m_ResourceManager->GetVertexArray("ObjVAO");
-            m_LightVAO = m_ResourceManager->GetVertexArray("LightVAO");
-            m_VBO = m_ResourceManager->GetVertexBuffer("ObjVBO");
             m_LightingShader = m_ResourceManager->GetShader("LightingShader");
             m_LightCubeShader = m_ResourceManager->GetShader("LightCubeShader");
 
@@ -56,55 +40,45 @@ void TestLighting::OnAttach(Renderer& renderer, ResourceManager& resourceManager
                 m_LightingShader->setInt("material.specular", 1);
             }
 
+            // Option B: Entities (projection/view/model handled by renderer)
+            Scene::Entity cube{};
+            cube.mesh = m_CubeMesh;
+            cube.shader = m_LightingShader;
+            cube.bind = [this](Shader& shader, const Renderer& r) {
+                shader.setVec3("objectColor", m_ObjectColor);
+                shader.setVec3("lightColor", m_LightColor);
+                shader.setVec3("lightPos", m_LightPosition);
+                shader.setVec3("viewPos", r.GetCameraPosition());
+                shader.setFloat("specModify", m_SpecModify);
+                shader.setFloat("ambientModify", m_AmbientModify);
+                shader.setFloat("diffuseModify", m_DiffuseModify);
+            };
+            scene.AddEntity(cube);
+
+            Scene::Entity light{};
+            light.mesh = m_LightCubeMesh;
+            light.shader = m_LightCubeShader;
+            light.update = [this](Scene::Transform& t, const Renderer&) {
+                t.position = m_LightPosition;
+                t.scale = glm::vec3(0.2f);
+            };
+            scene.AddEntity(light);
+
         }
 
         void TestLighting::OnUpdate(float deltaTime) {}
         void TestLighting::OnRender(Renderer& renderer) 
         {
-            m_LightingShader->Bind();
-            m_LightingShader->setVec3("objectColor", m_ObjectColor);
-            m_LightingShader->setVec3("lightColor", m_LightColor);
-            m_LightingShader->setVec3("lightPos", m_LightPosition);
-            m_LightingShader->setVec3("viewPos", renderer.GetCameraPosition());
-            m_LightingShader->setFloat("specModify", m_SpecModify);
-            m_LightingShader->setFloat("ambientModify", m_AmbientModify);
-            m_LightingShader->setFloat("diffuseModify", m_DiffuseModify);
-    
-            glm::mat4 projection = glm::perspective(glm::radians(renderer.GetCameraZoom()), 
-                                    (float)renderer.GetWindowWidth() / (float)renderer.GetWindowHeight(), 0.1f, 100.f);
-            glm::mat4 view = renderer.GetCameraViewMatrix();
-            m_LightingShader->setMat4("projection", projection);
-            m_LightingShader->setMat4("view", view);
-
-            glm::mat4 model = glm::mat4(1.f);
-            m_LightingShader->setMat4("model", model);
-
-            m_ObjVAO->Bind();
-            m_CubeMesh->Draw(renderer, view, projection);
-            m_ObjVAO->Unbind();
-        
-            m_LightCubeShader->Bind();
-            m_LightCubeShader->setMat4("projection", projection);
-            m_LightCubeShader->setMat4("view", view);
-            model = glm::mat4(1.f);
-            model = glm::translate(model, m_LightPosition);
-            model = glm::scale(model, glm::vec3(0.2f));
-            m_LightCubeShader->setMat4("model", model);
-
-            m_LightVAO->Bind();
-            m_LightCubeMesh->Draw(renderer, view, projection);
-            
+            // Draw is handled by Scene::Entity in Renderer::OnRender(scene)
         }
         void TestLighting::OnImGuiRender(Renderer& renderer) {}
         void TestLighting::OnDetach(Renderer& renderer) 
         {
-            renderer.ClearDevWindowWidgets();
-            renderer.EnableDepthTest(false);
-            m_ResourceManager->ClearVertexArrays();
-            m_ResourceManager->ClearVertexBuffers();
-            m_ResourceManager->ClearShaders();
-            m_ResourceManager->ClearTextures();
-            m_ResourceManager->ClearMeshes();
+            // Central cleanup happens on test switch/back.
+            m_LightingShader = nullptr;
+            m_LightCubeShader = nullptr;
+            m_CubeMesh = nullptr;
+            m_LightCubeMesh = nullptr;
         }
 
 }

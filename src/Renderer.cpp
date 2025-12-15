@@ -5,6 +5,7 @@
 #include "tests/TestLightCaster.h"
 #include "tests/TestLightingMaps.h"
 #include "tests/TestShaders.h"
+#include "Mesh.h"
 #include <GLFW/glfw3.h>
 
 /* Renderer Class */
@@ -29,6 +30,14 @@ Renderer::Renderer(const std::string& title, int width, int height)
 
 /* Renderer deconstructor - defaults nothing fancy */
 Renderer::~Renderer() {}
+
+void Renderer::ResetCamera()
+{
+    m_Camera = Camera();
+    // Keep Scene camera in sync for any scene-based rendering.
+    m_Scene.GetCamera() = m_Camera;
+    m_InputManager.ResetMouseLook();
+}
 
 /* When the render inits, run the following function
  * Sets glclearcolor, and clears buffer_bit and depth_buffer_bit 
@@ -85,17 +94,29 @@ void Renderer::OnRun() {
 
 void Renderer::OnRender(Scene& scene)
 {
-    // Update camera and process input (will be moved to InputManager later)
-    // These are now handled by the InputManager
-
-    // Render all renderable objects in the scene
-    glm::mat4 view = scene.GetCamera().GetViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(scene.GetCamera().GetZoom()), 
+    // Use the renderer camera as the authoritative camera (InputManager updates m_Camera).
+    glm::mat4 view = m_Camera.GetViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(m_Camera.GetZoom()),
                                             (float)m_Window.getWidth() / (float)m_Window.getHeight(), 0.1f, 100.f);
 
-    for (const auto& renderable : scene.GetRenderables())
+    // Option B: entities with centralized projection/view/model
+    for (auto& e : scene.GetEntities())
     {
-        renderable->Draw(*this, view, projection);
+        if (!e.mesh || !e.shader)
+            continue;
+
+        if (e.update)
+            e.update(e.transform, *this);
+
+        e.shader->Bind();
+        e.shader->setMat4("projection", projection);
+        e.shader->setMat4("view", view);
+        e.shader->setMat4("model", e.transform.ToMatrix());
+
+        if (e.bind)
+            e.bind(*e.shader, *this);
+
+        e.mesh->Draw(*this, view, projection);
     }
 }
 
@@ -124,6 +145,14 @@ void Renderer::SetClearColor(ImVec4 color)
     m_CurrentWinColor[0] = color.x;
     m_CurrentWinColor[1] = color.y;
     m_CurrentWinColor[2] = color.z;
+}
+
+void Renderer::ResetGLStateDefaults()
+{
+    // Baseline GL state we want between tests.
+    SetClearColor(m_DefaultWinColor);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    EnableDepthTest(true);
 }
 
 

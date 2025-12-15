@@ -11,9 +11,6 @@ namespace test
     {
     private:
         ResourceManager* m_ResourceManager = nullptr;
-        VertexArray* m_ObjVAO = nullptr;
-        VertexArray* m_LightVAO = nullptr;
-        VertexBuffer* m_VBO = nullptr;
         Shader* m_LightingShader = nullptr;
         Shader* m_LightCubeShader = nullptr;
         const Mesh* m_CubeMesh = nullptr;
@@ -28,51 +25,6 @@ namespace test
         glm::vec3 m_LightDiffuse =  glm::vec3(1.f);
         glm::vec3 m_LightSpecular = glm::vec3(1.f);
         glm::vec3 m_LightPosition = {1.2f, 1.0f, 2.0f};
-        float m_Verticies[6*36] = 
-        {
-            // pos[0:2] normal[3:5]
-            -0.5f, -0.5f, -0.5f, 0.f, 0.f, -1.f, 
-             0.5f, -0.5f, -0.5f, 0.f, 0.f, -1.f, 
-             0.5f,  0.5f, -0.5f, 0.f, 0.f, -1.f, 
-             0.5f,  0.5f, -0.5f, 0.f, 0.f, -1.f,
-            -0.5f,  0.5f, -0.5f, 0.f, 0.f, -1.f,
-            -0.5f, -0.5f, -0.5f, 0.f, 0.f, -1.f,
-
-            -0.5f, -0.5f,  0.5f,  0.f, 0.f, 1.f, 
-             0.5f, -0.5f,  0.5f,  0.f, 0.f, 1.f,
-             0.5f,  0.5f,  0.5f,  0.f, 0.f, 1.f, 
-             0.5f,  0.5f,  0.5f,  0.f, 0.f, 1.f,
-            -0.5f,  0.5f,  0.5f,  0.f, 0.f, 1.f,
-            -0.5f, -0.5f,  0.5f,  0.f, 0.f, 1.f,
-
-            -0.5f,  0.5f,  0.5f, -1.f, 0.f, 0.f, 
-            -0.5f,  0.5f, -0.5f, -1.f, 0.f, 0.f,
-            -0.5f, -0.5f, -0.5f, -1.f, 0.f, 0.f,
-            -0.5f, -0.5f, -0.5f, -1.f, 0.f, 0.f,
-            -0.5f, -0.5f,  0.5f, -1.f, 0.f, 0.f,
-            -0.5f,  0.5f,  0.5f, -1.f, 0.f, 0.f,
-
-             0.5f,  0.5f,  0.5f,  1.f, 0.f, 0.f,   
-             0.5f,  0.5f, -0.5f,  1.f, 0.f, 0.f, 
-             0.5f, -0.5f, -0.5f,  1.f, 0.f, 0.f, 
-             0.5f, -0.5f, -0.5f,  1.f, 0.f, 0.f, 
-             0.5f, -0.5f,  0.5f,  1.f, 0.f, 0.f, 
-             0.5f,  0.5f,  0.5f,  1.f, 0.f, 0.f, 
-
-            -0.5f, -0.5f, -0.5f,  0.f,-1.f, 0.f, 
-             0.5f, -0.5f, -0.5f,  0.f,-1.f, 0.f, 
-             0.5f, -0.5f,  0.5f,  0.f,-1.f, 0.f, 
-             0.5f, -0.5f,  0.5f,  0.f,-1.f, 0.f, 
-            -0.5f, -0.5f,  0.5f,  0.f,-1.f, 0.f, 
-            -0.5f, -0.5f, -0.5f,  0.f,-1.f, 0.f, 
-
-            -0.5f,  0.5f, -0.5f,  0.f, 1.f, 0.f, 
-             0.5f,  0.5f, -0.5f,  0.f, 1.f, 0.f, 
-             0.5f,  0.5f,  0.5f,  0.f, 1.f, 0.f, 
-             0.5f,  0.5f,  0.5f,  0.f, 1.f, 0.f, 
-            -0.5f,  0.5f,  0.5f,  0.f, 1.f, 0.f,
-            -0.5f,  0.5f, -0.5f,  0.f, 1.f, 0.f
-        };
 
         Material m_CurrentMaterial;
         MaterialName m_SelectedMaterial = MaterialName::EMERALD;

@@ -62,9 +62,7 @@ void TestClearColor::OnImGuiRender(Renderer& renderer)
 
 void TestClearColor::OnDetach(Renderer& renderer)
 {
-    glm::vec3 defaultColor = renderer.GetWindowDefaultColor();
-    renderer.SetClearColor(defaultColor);
-    renderer.RemoveDevWindowWidget("Clear Color");
+    // Central cleanup happens on test switch/back.
 }
 
 void TestClearColor::ResetColor(Renderer& renderer)

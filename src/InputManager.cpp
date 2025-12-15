@@ -19,6 +19,13 @@ InputManager::InputManager(GLFWwindow* window, Camera& camera)
     glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
+void InputManager::ResetMouseLook()
+{
+    m_FirstMouse = true;
+    m_LastX = 0.0f;
+    m_LastY = 0.0f;
+}
+
 void InputManager::Update(float deltaTime)
 {
     // Skip input processing if ImGui is capturing mouse or keyboard
